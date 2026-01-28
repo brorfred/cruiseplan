@@ -1,0 +1,4 @@
+dash==2.14.2
+dash-leaflet==1.0.15
+plotly==5.18.0
+pandas==2.1.4
