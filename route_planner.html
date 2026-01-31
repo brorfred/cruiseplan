@@ -376,6 +376,19 @@
             outline: none;
             background: rgba(65, 105, 225, 0.05);
         }
+        
+        /* All other editable inputs in table - same styling */
+        .custom-cell input[type="text"]:not(.flatpickr-input) {
+            border: none;
+            background: transparent;
+            color: #4169e1; /* Royal blue */
+            font-weight: 500;
+        }
+        
+        .custom-cell input[type="text"]:not(.flatpickr-input):focus {
+            outline: none;
+            background: rgba(65, 105, 225, 0.05);
+        }
     </style>
 </head>
 <body>
