@@ -1113,10 +1113,9 @@
                             
                             routeData.splice(currentIndex, 1);
                             
-                            // Reassign IDs
+                            // Only reassign IDs (preserve custom station names)
                             routeData.forEach((point, idx) => {
                                 point.id = idx + 1;
-                                point.stationId = `Station-${idx + 1}`;
                             });
                             
                             updateDistances();
@@ -1197,10 +1196,9 @@
                     
                     routeData.splice(insertIndex, 0, newPoint);
                     
-                    // Reassign IDs and station names
+                    // Only reassign IDs (preserve custom station names)
                     routeData.forEach((point, idx) => {
                         point.id = idx + 1;
-                        point.stationId = `Station-${idx + 1}`;
                     });
                     
                     updateDistances();
