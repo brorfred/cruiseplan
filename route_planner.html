@@ -1041,8 +1041,42 @@
             
             marker.stationIndex = index;
             
+            // Add number label for station 2 onwards (not for first station)
+            if (index > 0) {
+                const numberLabel = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        html: `<div style="
+                            background: white;
+                            border: 2px solid ${isStartOrEnd ? '#ff0000' : '#3388ff'};
+                            border-radius: 50%;
+                            width: 24px;
+                            height: 24px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: 12px;
+                            color: #333;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        ">${index}</div>`,
+                        className: 'number-label',
+                        iconSize: [24, 24],
+                        iconAnchor: [32, 12] // Position to the right of the marker
+                    }),
+                    interactive: false // Don't interfere with clicks
+                }).addTo(map);
+                
+                // Store the label reference so we can update/remove it
+                marker.numberLabel = numberLabel;
+            }
+            
             marker.on('dragend', function(e) {
                 const newLatLng = e.target.getLatLng();
+                
+                // Update number label position if it exists
+                if (marker.numberLabel) {
+                    marker.numberLabel.setLatLng(newLatLng);
+                }
                 
                 // Find the current index of this marker in the markers array
                 const currentIndex = markers.indexOf(marker);
@@ -1190,8 +1224,13 @@
         
         // Initialize map with markers and polyline
         function initializeMap() {
-            // Clear existing markers
-            markers.forEach(marker => map.removeLayer(marker));
+            // Clear existing markers and their number labels
+            markers.forEach(marker => {
+                if (marker.numberLabel) {
+                    map.removeLayer(marker.numberLabel);
+                }
+                map.removeLayer(marker);
+            });
             markers = [];
             
             // Create markers for each point
