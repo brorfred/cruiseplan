@@ -6,6 +6,7 @@
     <title>Route Planner</title>
     
     <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- Tabulator CSS -->
@@ -316,6 +317,27 @@
             font-family: monospace;
             color: #333;
         }
+        
+        /* Flatpickr customization for nautical theme */
+        .flatpickr-calendar {
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .flatpickr-day.selected, 
+        .flatpickr-day.selected:hover {
+            background: #2c5aa0;
+            border-color: #2c5aa0;
+        }
+        
+        .flatpickr-time input:hover,
+        .flatpickr-time input:focus {
+            background: #e7f3ff;
+        }
+        
+        .flatpickr-calendar.inline {
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -376,26 +398,10 @@
                 <div style="margin-bottom: 15px;">
                     <h4 style="font-size: 13px; color: #2c5aa0; margin-bottom: 8px;">Cruise Dates</h4>
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Cruise Start Date & Time:</label>
-                    <div style="display: flex; gap: 2px; margin-bottom: 8px;">
-                        <input type="date" id="setup-start-date" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
-                        <select id="setup-start-hour" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
-                            <option value="">HH</option>
-                        </select>
-                        <select id="setup-start-minute" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
-                            <option value="">MM</option>
-                        </select>
-                    </div>
+                    <input type="text" id="setup-start-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: monospace;">
                     
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Latest End Date & Time (deadline):</label>
-                    <div style="display: flex; gap: 2px;">
-                        <input type="date" id="setup-end-date" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
-                        <select id="setup-end-hour" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
-                            <option value="">HH</option>
-                        </select>
-                        <select id="setup-end-minute" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
-                            <option value="">MM</option>
-                        </select>
-                    </div>
+                    <input type="text" id="setup-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: monospace;">
                     <small style="color: #6c757d; font-size: 11px;">Must arrive at final station by this date/time</small>
                 </div>
                 
@@ -414,14 +420,8 @@
             
             <span style="margin-left: 20px; margin-right: 8px;">|</span>
             
-            <label for="latest-end-date">Latest End Date:</label>
-            <input type="date" id="latest-end-date" style="margin-left: 8px; padding: 4px 8px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 135px;">
-            <select id="latest-end-hour" style="margin-left: 2px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 50px;">
-                <option value="">HH</option>
-            </select>
-            <select id="latest-end-minute" style="margin-left: 2px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 50px;">
-                <option value="">MM</option>
-            </select>
+            <label for="latest-end-datetime">Latest End Date:</label>
+            <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 8px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 145px; font-family: monospace;">
         </div>
         <div id="data-table"></div>
         <div id="button-panel">
@@ -449,50 +449,29 @@
     <!-- Tabulator JS -->
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
     <script>
-        // Populate hour and minute dropdowns for setup modal
-        (function() {
-            const startHourSelect = document.getElementById('setup-start-hour');
-            const startMinuteSelect = document.getElementById('setup-start-minute');
-            const endHourSelect = document.getElementById('setup-end-hour');
-            const endMinuteSelect = document.getElementById('setup-end-minute');
-            
-            // Populate hours (00-23)
-            for (let h = 0; h < 24; h++) {
-                const hourStr = String(h).padStart(2, '0');
-                startHourSelect.add(new Option(hourStr, hourStr));
-                endHourSelect.add(new Option(hourStr, hourStr));
-            }
-            
-            // Populate minutes (00-59)
-            for (let m = 0; m < 60; m++) {
-                const minuteStr = String(m).padStart(2, '0');
-                startMinuteSelect.add(new Option(minuteStr, minuteStr));
-                endMinuteSelect.add(new Option(minuteStr, minuteStr));
-            }
-            
-            // Set defaults to 09:00 for start
-            startHourSelect.value = '09';
-            startMinuteSelect.value = '00';
-        })();
+        // Initialize flatpickr for all datetime inputs
+        const flatpickrConfig = {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true,
+            minuteIncrement: 1,
+            allowInput: true
+        };
         
-        // Populate hour and minute dropdowns for header latest end date
-        (function() {
-            const headerEndHour = document.getElementById('latest-end-hour');
-            const headerEndMinute = document.getElementById('latest-end-minute');
-            
-            // Populate hours (00-23)
-            for (let h = 0; h < 24; h++) {
-                const hourStr = String(h).padStart(2, '0');
-                headerEndHour.add(new Option(hourStr, hourStr));
-            }
-            
-            // Populate minutes (00-59)
-            for (let m = 0; m < 60; m++) {
-                const minuteStr = String(m).padStart(2, '0');
-                headerEndMinute.add(new Option(minuteStr, minuteStr));
-            }
-        })();
+        // Setup modal pickers
+        flatpickr("#setup-start-datetime", {
+            ...flatpickrConfig,
+            defaultDate: new Date(new Date().setHours(9, 0, 0, 0))
+        });
+        
+        flatpickr("#setup-end-datetime", flatpickrConfig);
+        
+        // Header latest end date picker
+        flatpickr("#latest-end-datetime", flatpickrConfig);
         
         // Draggable resizer functionality
         const resizer = document.getElementById('resizer');
@@ -786,13 +765,8 @@
             const defaultSpeed = document.getElementById('setup-speed').value || '8';
             const numStations = document.getElementById('setup-num-stations').value || '3';
             
-            const startDate = document.getElementById('setup-start-date').value;
-            const startHour = document.getElementById('setup-start-hour').value;
-            const startMinute = document.getElementById('setup-start-minute').value;
-            
-            const endDate = document.getElementById('setup-end-date').value;
-            const endHour = document.getElementById('setup-end-hour').value;
-            const endMinute = document.getElementById('setup-end-minute').value;
+            const startDateTime = document.getElementById('setup-start-datetime').value;
+            const endDateTime = document.getElementById('setup-end-datetime').value;
             
             if (!startLat || !startLng || !endLat || !endLng) {
                 alert('Please enter all latitude and longitude values.');
@@ -802,24 +776,16 @@
             // Update the main default speed input
             document.getElementById('normal-speed').value = defaultSpeed;
             
-            // Combine start date and time
-            let startDateTime = '';
-            if (startDate && startHour && startMinute) {
-                startDateTime = `${startDate}T${startHour}:${startMinute}`;
-                cruiseStartDate = startDateTime;
+            // Save cruise dates
+            if (startDateTime) {
+                cruiseStartDate = startDateTime.replace(' ', 'T');
                 localStorage.setItem('cruiseStartDate', cruiseStartDate);
             }
             
-            // Combine end date and time
-            if (endDate && endHour && endMinute) {
-                const endDateTime = `${endDate}T${endHour}:${endMinute}`;
-                latestEndDate = endDateTime;
+            if (endDateTime) {
+                latestEndDate = endDateTime.replace(' ', 'T');
                 localStorage.setItem('latestEndDate', latestEndDate);
-                
-                // Set header fields
-                document.getElementById('latest-end-date').value = endDate;
-                document.getElementById('latest-end-hour').value = endHour;
-                document.getElementById('latest-end-minute').value = endMinute;
+                document.getElementById('latest-end-datetime').value = endDateTime;
             }
             
             // Create new route
@@ -827,7 +793,7 @@
             
             // Set departure time of first station to cruise start date if provided
             if (startDateTime) {
-                routeData[0].departure = startDateTime.replace('T', ' ');
+                routeData[0].departure = startDateTime;
             }
             
             // Apply the default speed to all stations
@@ -1289,18 +1255,9 @@
         
         // Load cruise dates if they exist
         if (latestEndDate) {
-            // Parse datetime format YYYY-MM-DDTHH:MM
-            const parts = latestEndDate.split('T');
-            if (parts.length === 2) {
-                const datePart = parts[0];
-                const timeParts = parts[1].split(':');
-                
-                document.getElementById('latest-end-date').value = datePart;
-                if (timeParts.length >= 2) {
-                    document.getElementById('latest-end-hour').value = timeParts[0];
-                    document.getElementById('latest-end-minute').value = timeParts[1];
-                }
-            }
+            // Convert from ISO format (YYYY-MM-DDTHH:MM) to display format (YYYY-MM-DD HH:MM)
+            const displayDate = latestEndDate.replace('T', ' ');
+            document.getElementById('latest-end-datetime').value = displayDate;
         }
         
         console.log('isFirstSetup:', isFirstSetup);
@@ -1331,8 +1288,8 @@
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
                     { field: 'speed', width: '50px', editable: true, compact: true, flex: false },
-                    { field: 'arrival', width: '205px', editable: true, compact: false, flex: false },
-                    { field: 'departure', width: '205px', editable: true, compact: false, flex: false },
+                    { field: 'arrival', width: '150px', editable: true, compact: false, flex: false },
+                    { field: 'departure', width: '150px', editable: true, compact: false, flex: false },
                     { field: 'duration', width: '70px', editable: true, compact: false, flex: false }
                 ];
                 
@@ -1359,86 +1316,34 @@
                     const value = col.formatter ? col.formatter(data[col.field]) : data[col.field];
                     
                     if (isEditable) {
-                        // Use separate date and time inputs for arrival and departure fields
+                        // Use flatpickr for arrival and departure fields
                         if (col.field === 'arrival' || col.field === 'departure') {
-                            // Create a container for date and time inputs
-                            const dateTimeContainer = document.createElement('div');
-                            dateTimeContainer.style.display = 'flex';
-                            dateTimeContainer.style.gap = '1px';
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = value || '';
+                            input.placeholder = 'YYYY-MM-DD HH:MM';
+                            input.style.fontFamily = 'monospace';
+                            input.style.fontSize = '10px';
+                            input.dataset.field = col.field;
+                            input.dataset.rowIndex = rowIndex;
                             
-                            // Date input
-                            const dateInput = document.createElement('input');
-                            dateInput.type = 'date';
-                            dateInput.style.width = '105px';
-                            dateInput.style.fontSize = '10px';
-                            dateInput.style.padding = '1px 2px';
-                            dateInput.style.border = '1px solid #dee2e6';
-                            
-                            // Hour dropdown (00-23)
-                            const hourSelect = document.createElement('select');
-                            hourSelect.style.width = '48px';
-                            hourSelect.style.fontSize = '11px';
-                            hourSelect.style.padding = '2px';
-                            hourSelect.style.border = '1px solid #dee2e6';
-                            for (let h = 0; h < 24; h++) {
-                                const option = document.createElement('option');
-                                option.value = String(h).padStart(2, '0');
-                                option.textContent = String(h).padStart(2, '0');
-                                hourSelect.appendChild(option);
-                            }
-                            
-                            // Minute dropdown (00-59)
-                            const minuteSelect = document.createElement('select');
-                            minuteSelect.style.width = '48px';
-                            minuteSelect.style.fontSize = '11px';
-                            minuteSelect.style.padding = '2px';
-                            minuteSelect.style.border = '1px solid #dee2e6';
-                            for (let m = 0; m < 60; m++) {
-                                const option = document.createElement('option');
-                                option.value = String(m).padStart(2, '0');
-                                option.textContent = String(m).padStart(2, '0');
-                                minuteSelect.appendChild(option);
-                            }
-                            
-                            // Parse existing value "YYYY-MM-DD HH:MM"
-                            if (value) {
-                                const parts = value.split(' ');
-                                if (parts.length === 2) {
-                                    dateInput.value = parts[0]; // YYYY-MM-DD
-                                    const timeParts = parts[1].split(':');
-                                    if (timeParts.length === 2) {
-                                        hourSelect.value = timeParts[0]; // HH
-                                        minuteSelect.value = timeParts[1]; // MM
-                                    }
-                                }
-                            }
-                            
-                            dateInput.dataset.field = col.field;
-                            dateInput.dataset.rowIndex = rowIndex;
-                            hourSelect.dataset.field = col.field;
-                            hourSelect.dataset.rowIndex = rowIndex;
-                            minuteSelect.dataset.field = col.field;
-                            minuteSelect.dataset.rowIndex = rowIndex;
-                            
-                            const updateDateTime = function() {
-                                if (dateInput.value && hourSelect.value && minuteSelect.value) {
+                            // Initialize flatpickr
+                            flatpickr(input, {
+                                enableTime: true,
+                                dateFormat: "Y-m-d H:i",
+                                time_24hr: true,
+                                minuteIncrement: 1,
+                                allowInput: true,
+                                onChange: function(selectedDates, dateStr, instance) {
                                     // Save state before modification
                                     saveToHistory();
                                     
-                                    const newValue = dateInput.value + ' ' + hourSelect.value + ':' + minuteSelect.value;
-                                    routeData[rowIndex][col.field] = newValue;
+                                    routeData[rowIndex][col.field] = dateStr;
                                     handleFieldUpdate(col.field, rowIndex);
                                 }
-                            };
+                            });
                             
-                            dateInput.addEventListener('change', updateDateTime);
-                            hourSelect.addEventListener('change', updateDateTime);
-                            minuteSelect.addEventListener('change', updateDateTime);
-                            
-                            dateTimeContainer.appendChild(dateInput);
-                            dateTimeContainer.appendChild(hourSelect);
-                            dateTimeContainer.appendChild(minuteSelect);
-                            cell.appendChild(dateTimeContainer);
+                            cell.appendChild(input);
                         } else {
                             const input = document.createElement('input');
                             input.type = 'text';
@@ -1525,13 +1430,13 @@
                 { 
                     title: "Arrival", 
                     field: "arrival", 
-                    width: 205,
+                    width: 150,
                     headerSort: false 
                 },
                 { 
                     title: "Departure", 
                     field: "departure", 
-                    width: 205,
+                    width: 150,
                     headerSort: false 
                 },
                 { 
@@ -1590,26 +1495,18 @@
         });
         
         // Handle latest end date changes
-        const updateLatestEndDate = function() {
-            const dateValue = document.getElementById('latest-end-date').value;
-            const hourValue = document.getElementById('latest-end-hour').value;
-            const minuteValue = document.getElementById('latest-end-minute').value;
-            
-            if (dateValue && hourValue && minuteValue) {
-                latestEndDate = `${dateValue}T${hourValue}:${minuteValue}`;
+        document.getElementById('latest-end-datetime').addEventListener('change', function() {
+            const value = this.value;
+            if (value) {
+                latestEndDate = value.replace(' ', 'T');
                 localStorage.setItem('latestEndDate', latestEndDate);
                 updateTimeBudget();
-            } else if (!dateValue && !hourValue && !minuteValue) {
-                // All cleared
+            } else {
                 latestEndDate = '';
                 localStorage.setItem('latestEndDate', latestEndDate);
                 updateTimeBudget();
             }
-        };
-        
-        document.getElementById('latest-end-date').addEventListener('change', updateLatestEndDate);
-        document.getElementById('latest-end-hour').addEventListener('change', updateLatestEndDate);
-        document.getElementById('latest-end-minute').addEventListener('change', updateLatestEndDate);
+        });
         
         // Handle download CSV
         document.getElementById('download-csv').addEventListener('click', function() {
