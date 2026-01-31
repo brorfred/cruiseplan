@@ -110,11 +110,12 @@
         
         #button-panel {
             padding: 12px 15px;
-            background: linear-gradient(to top, #f8f9fa, #e9ecef);
-            border-top: 1px solid #dee2e6;
+            background: #2c5aa0;
+            border-top: 1px solid #1e3a6b;
             display: flex;
             gap: 8px;
-            justify-content: center;
+            justify-content: flex-start;
+            align-items: center;
         }
         
         #button-panel button {
@@ -130,33 +131,14 @@
         
         #button-panel button:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        #button-panel button#download-csv:hover {
-            background: #218838;
-        }
-        
-        #button-panel button#undo-btn:hover {
-            background: #5a6268;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
         }
         
         #button-panel button#undo-btn:disabled {
             background: #9ca3af;
             cursor: not-allowed;
             opacity: 0.5;
-        }
-        
-        #button-panel button#download-geojson:hover {
-            background: #5a32a3;
-        }
-        
-        #button-panel button#upload-csv:hover {
-            background: #138496;
-        }
-        
-        #button-panel button#reset-data:hover {
-            background: #c82333;
         }
         
         /* Tabulator customization for compact look */
@@ -338,8 +320,8 @@
 </head>
 <body>
     <!-- Initial Setup Modal -->
-    <div id="setup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+    <div id="setup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 20px auto; max-height: 90vh; overflow-y: auto;">
             <h2 style="margin-top: 0; color: #2c5aa0;">Route Setup</h2>
             <p style="color: #6c757d; margin-bottom: 20px;">Create a new route or import from CSV:</p>
             
@@ -387,8 +369,34 @@
                     <input type="number" id="setup-speed" placeholder="e.g., 8" step="0.1" min="0" value="8" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px;">
                     
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Number of Stations (including start and end):</label>
-                    <input type="number" id="setup-num-stations" placeholder="e.g., 5" step="1" min="2" value="3" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                    <input type="number" id="setup-num-stations" placeholder="e.g., 5" step="1" min="2" value="3" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px;">
                     <small style="color: #6c757d; font-size: 11px;">Stations will be evenly distributed along the route</small>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <h4 style="font-size: 13px; color: #2c5aa0; margin-bottom: 8px;">Cruise Dates</h4>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Cruise Start Date & Time:</label>
+                    <div style="display: flex; gap: 2px; margin-bottom: 8px;">
+                        <input type="date" id="setup-start-date" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                        <select id="setup-start-hour" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                            <option value="">HH</option>
+                        </select>
+                        <select id="setup-start-minute" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                            <option value="">MM</option>
+                        </select>
+                    </div>
+                    
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Latest End Date & Time (deadline):</label>
+                    <div style="display: flex; gap: 2px;">
+                        <input type="date" id="setup-end-date" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                        <select id="setup-end-hour" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                            <option value="">HH</option>
+                        </select>
+                        <select id="setup-end-minute" style="width: 60px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                            <option value="">MM</option>
+                        </select>
+                    </div>
+                    <small style="color: #6c757d; font-size: 11px;">Must arrive at final station by this date/time</small>
                 </div>
                 
                 <button id="setup-submit" style="width: 100%; padding: 12px; background: #2c5aa0; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer;">Create Route</button>
@@ -403,6 +411,17 @@
             <label for="normal-speed">Default Ship Spd (knots):</label>
             <input type="number" id="normal-speed" placeholder="e.g., 10" step="0.1" min="0" value="8">
             <button id="apply-speed">Apply to All</button>
+            
+            <span style="margin-left: 20px; margin-right: 8px;">|</span>
+            
+            <label for="latest-end-date">Latest End Date:</label>
+            <input type="date" id="latest-end-date" style="margin-left: 8px; padding: 4px 8px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 135px;">
+            <select id="latest-end-hour" style="margin-left: 2px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 50px;">
+                <option value="">HH</option>
+            </select>
+            <select id="latest-end-minute" style="margin-left: 2px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 50px;">
+                <option value="">MM</option>
+            </select>
         </div>
         <div id="data-table"></div>
         <div id="button-panel">
@@ -411,7 +430,13 @@
             <button id="download-geojson" style="background: #6f42c1;">Download GeoJSON</button>
             <button id="upload-csv" style="background: #17a2b8;">Upload CSV</button>
             <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
-            <button id="reset-data" style="background: #dc3545;">Reset All Data</button>
+            
+            <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+                <div style="padding: 10px 20px; font-size: 14px; border-radius: 4px; min-width: 200px; text-align: center;" id="time-budget">
+                    <strong>Time Budget:</strong> --
+                </div>
+                <button id="reset-data" style="background: #dc3545;">Reset All Data</button>
+            </div>
         </div>
     </div>
 
@@ -425,6 +450,50 @@
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     
     <script>
+        // Populate hour and minute dropdowns for setup modal
+        (function() {
+            const startHourSelect = document.getElementById('setup-start-hour');
+            const startMinuteSelect = document.getElementById('setup-start-minute');
+            const endHourSelect = document.getElementById('setup-end-hour');
+            const endMinuteSelect = document.getElementById('setup-end-minute');
+            
+            // Populate hours (00-23)
+            for (let h = 0; h < 24; h++) {
+                const hourStr = String(h).padStart(2, '0');
+                startHourSelect.add(new Option(hourStr, hourStr));
+                endHourSelect.add(new Option(hourStr, hourStr));
+            }
+            
+            // Populate minutes (00-59)
+            for (let m = 0; m < 60; m++) {
+                const minuteStr = String(m).padStart(2, '0');
+                startMinuteSelect.add(new Option(minuteStr, minuteStr));
+                endMinuteSelect.add(new Option(minuteStr, minuteStr));
+            }
+            
+            // Set defaults to 09:00 for start
+            startHourSelect.value = '09';
+            startMinuteSelect.value = '00';
+        })();
+        
+        // Populate hour and minute dropdowns for header latest end date
+        (function() {
+            const headerEndHour = document.getElementById('latest-end-hour');
+            const headerEndMinute = document.getElementById('latest-end-minute');
+            
+            // Populate hours (00-23)
+            for (let h = 0; h < 24; h++) {
+                const hourStr = String(h).padStart(2, '0');
+                headerEndHour.add(new Option(hourStr, hourStr));
+            }
+            
+            // Populate minutes (00-59)
+            for (let m = 0; m < 60; m++) {
+                const minuteStr = String(m).padStart(2, '0');
+                headerEndMinute.add(new Option(minuteStr, minuteStr));
+            }
+        })();
+        
         // Draggable resizer functionality
         const resizer = document.getElementById('resizer');
         const leftPanel = document.getElementById('map');
@@ -546,6 +615,10 @@
         // Check if this is first time setup
         let isFirstSetup = !localStorage.getItem('shipRouteData');
         
+        // Cruise dates
+        let cruiseStartDate = localStorage.getItem('cruiseStartDate') || '';
+        let latestEndDate = localStorage.getItem('latestEndDate') || '';
+        
         // History tracking for undo functionality
         let history = [];
         let maxHistorySize = 50; // Keep last 50 states
@@ -578,6 +651,7 @@
                 table.setData(routeData);
                 saveRouteData();
                 updateUndoButton();
+                updateTimeBudget();
             }
         }
         
@@ -590,6 +664,62 @@
             } else {
                 undoBtn.disabled = true;
                 undoBtn.title = 'No actions to undo';
+            }
+        }
+        
+        // Function to calculate and display time budget
+        function updateTimeBudget() {
+            const budgetSpan = document.getElementById('time-budget');
+            
+            if (!latestEndDate) {
+                budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                budgetSpan.style.backgroundColor = 'transparent';
+                budgetSpan.style.color = 'inherit';
+                return;
+            }
+            
+            // Get the last station's arrival time
+            if (routeData.length === 0) {
+                budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                return;
+            }
+            
+            const lastStation = routeData[routeData.length - 1];
+            const arrivalTime = parseDateTime(lastStation.arrival);
+            const deadline = new Date(latestEndDate);
+            
+            if (!arrivalTime) {
+                budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                budgetSpan.style.backgroundColor = 'transparent';
+                budgetSpan.style.color = 'inherit';
+                return;
+            }
+            
+            // Calculate difference in hours
+            const diffMs = deadline - arrivalTime;
+            const diffHours = diffMs / (1000 * 60 * 60);
+            
+            // Format the budget (days and hours only, no minutes)
+            const absDiffHours = Math.abs(diffHours);
+            const days = Math.floor(absDiffHours / 24);
+            const hours = Math.floor(absDiffHours % 24);
+            
+            let budgetText = '';
+            if (days > 0) {
+                budgetText = `${diffHours >= 0 ? '+' : '-'}${days}d ${hours}h`;
+            } else {
+                budgetText = `${diffHours >= 0 ? '+' : '-'}${hours}h`;
+            }
+            
+            budgetSpan.innerHTML = `<strong>Time Budget:</strong> ${budgetText}`;
+            
+            // Color code: green if positive (on time), red if negative (late)
+            if (diffHours >= 0) {
+                budgetSpan.style.backgroundColor = '#d4edda';
+                budgetSpan.style.color = '#155724';
+            } else {
+                budgetSpan.style.backgroundColor = '#f8d7da';
+                budgetSpan.style.color = '#721c24';
             }
         }
         
@@ -656,6 +786,14 @@
             const defaultSpeed = document.getElementById('setup-speed').value || '8';
             const numStations = document.getElementById('setup-num-stations').value || '3';
             
+            const startDate = document.getElementById('setup-start-date').value;
+            const startHour = document.getElementById('setup-start-hour').value;
+            const startMinute = document.getElementById('setup-start-minute').value;
+            
+            const endDate = document.getElementById('setup-end-date').value;
+            const endHour = document.getElementById('setup-end-hour').value;
+            const endMinute = document.getElementById('setup-end-minute').value;
+            
             if (!startLat || !startLng || !endLat || !endLng) {
                 alert('Please enter all latitude and longitude values.');
                 return;
@@ -664,8 +802,33 @@
             // Update the main default speed input
             document.getElementById('normal-speed').value = defaultSpeed;
             
+            // Combine start date and time
+            let startDateTime = '';
+            if (startDate && startHour && startMinute) {
+                startDateTime = `${startDate}T${startHour}:${startMinute}`;
+                cruiseStartDate = startDateTime;
+                localStorage.setItem('cruiseStartDate', cruiseStartDate);
+            }
+            
+            // Combine end date and time
+            if (endDate && endHour && endMinute) {
+                const endDateTime = `${endDate}T${endHour}:${endMinute}`;
+                latestEndDate = endDateTime;
+                localStorage.setItem('latestEndDate', latestEndDate);
+                
+                // Set header fields
+                document.getElementById('latest-end-date').value = endDate;
+                document.getElementById('latest-end-hour').value = endHour;
+                document.getElementById('latest-end-minute').value = endMinute;
+            }
+            
             // Create new route
             routeData = createRouteFromPositions(startName, startLat, startLng, endName, endLat, endLng, numStations);
+            
+            // Set departure time of first station to cruise start date if provided
+            if (startDateTime) {
+                routeData[0].departure = startDateTime.replace('T', ' ');
+            }
             
             // Apply the default speed to all stations
             routeData.forEach(function(point) {
@@ -679,6 +842,7 @@
             initializeMap(); // This already includes zoom to fit
             table.setData(routeData);
             saveRouteData();
+            updateTimeBudget();
             
             hideSetupModal();
         });
@@ -929,6 +1093,7 @@
                     updatePolyline();
                     table.setData(routeData);
                     saveRouteData();
+                    updateTimeBudget();
                 }
             });
             
@@ -959,6 +1124,7 @@
                             initializeMap();
                             table.setData(routeData);
                             saveRouteData();
+                            updateTimeBudget();
                         }
                     }
                 });
@@ -1042,6 +1208,7 @@
                     initializeMap();
                     table.setData(routeData);
                     saveRouteData();
+                    updateTimeBudget();
                 }
             });
         }
@@ -1081,16 +1248,19 @@
                 updatePolyline();
                 table.setData(routeData);
                 saveRouteData();
+                updateTimeBudget();
             } else if (field === "speed" || field === "duration") {
                 // Recalculate times when speed or duration changes
                 calculateTimes();
                 table.setData(routeData);
                 saveRouteData();
+                updateTimeBudget();
             } else if (field === "departure") {
                 // When departure is manually edited, recalculate from this point forward
                 calculateTimesFromIndex(index);
                 table.setData(routeData);
                 saveRouteData();
+                updateTimeBudget();
             } else if (field === "arrival") {
                 // When arrival is manually edited, update departure based on duration, then recalculate forward
                 if (index > 0) {
@@ -1103,6 +1273,7 @@
                     calculateTimesFromIndex(index);
                     table.setData(routeData);
                     saveRouteData();
+                    updateTimeBudget();
                 }
             } else {
                 // For other fields (stationId), just save
@@ -1115,6 +1286,22 @@
         calculateTimes();
         ensureDefaultSpeed(); // Make sure all speeds are populated
         updateUndoButton(); // Initialize undo button state
+        
+        // Load cruise dates if they exist
+        if (latestEndDate) {
+            // Parse datetime format YYYY-MM-DDTHH:MM
+            const parts = latestEndDate.split('T');
+            if (parts.length === 2) {
+                const datePart = parts[0];
+                const timeParts = parts[1].split(':');
+                
+                document.getElementById('latest-end-date').value = datePart;
+                if (timeParts.length >= 2) {
+                    document.getElementById('latest-end-hour').value = timeParts[0];
+                    document.getElementById('latest-end-minute').value = timeParts[1];
+                }
+            }
+        }
         
         console.log('isFirstSetup:', isFirstSetup);
         console.log('localStorage data:', localStorage.getItem('shipRouteData'));
@@ -1366,6 +1553,7 @@
         } else {
             console.log('Loading existing data');
             initializeMap();
+            updateTimeBudget();
         }
         
         // Handle normal ship speed form
@@ -1386,6 +1574,7 @@
             calculateTimes();
             table.setData(routeData);
             saveRouteData();
+            updateTimeBudget();
             
             alert(`Updated all stations with speed ${normalSpeed} knots.`);
         });
@@ -1399,6 +1588,28 @@
         document.getElementById('undo-btn').addEventListener('click', function() {
             undo();
         });
+        
+        // Handle latest end date changes
+        const updateLatestEndDate = function() {
+            const dateValue = document.getElementById('latest-end-date').value;
+            const hourValue = document.getElementById('latest-end-hour').value;
+            const minuteValue = document.getElementById('latest-end-minute').value;
+            
+            if (dateValue && hourValue && minuteValue) {
+                latestEndDate = `${dateValue}T${hourValue}:${minuteValue}`;
+                localStorage.setItem('latestEndDate', latestEndDate);
+                updateTimeBudget();
+            } else if (!dateValue && !hourValue && !minuteValue) {
+                // All cleared
+                latestEndDate = '';
+                localStorage.setItem('latestEndDate', latestEndDate);
+                updateTimeBudget();
+            }
+        };
+        
+        document.getElementById('latest-end-date').addEventListener('change', updateLatestEndDate);
+        document.getElementById('latest-end-hour').addEventListener('change', updateLatestEndDate);
+        document.getElementById('latest-end-minute').addEventListener('change', updateLatestEndDate);
         
         // Handle download CSV
         document.getElementById('download-csv').addEventListener('click', function() {
@@ -1537,6 +1748,7 @@
                         initializeMap();
                         table.setData(routeData);
                         saveRouteData();
+                        updateTimeBudget();
                         alert(`Successfully imported ${newRouteData.length} stations from CSV.`);
                     } else {
                         alert('No valid data found in CSV file.');
