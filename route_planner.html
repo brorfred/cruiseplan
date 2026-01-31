@@ -363,6 +363,19 @@
             background: #e7f3ff;
             border-color: #2c5aa0;
         }
+        
+        /* Flatpickr datetime inputs in table - custom styling */
+        .custom-cell input[type="text"].flatpickr-input {
+            border: none;
+            background: transparent;
+            color: #4169e1; /* Royal blue */
+            font-weight: 500;
+        }
+        
+        .custom-cell input[type="text"].flatpickr-input:focus {
+            outline: none;
+            background: rgba(65, 105, 225, 0.05);
+        }
     </style>
 </head>
 <body>
@@ -1521,6 +1534,7 @@
                             input.style.fontSize = '11px';
                             input.style.padding = '2px 4px';
                             input.style.width = '100%';
+                            input.className = 'flatpickr-input'; // Add class for CSS styling
                             input.dataset.field = col.field;
                             input.dataset.rowIndex = rowIndex;
                             
