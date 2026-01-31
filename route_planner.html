@@ -1563,6 +1563,14 @@
                 return;
             }
             
+            // Confirm before applying to all stations
+            if (!confirm(`Apply speed ${normalSpeed} knots to all stations?\n\nThis will overwrite individual station speeds.`)) {
+                return;
+            }
+            
+            // Save state before modification
+            saveToHistory();
+            
             // Update ALL speed cells with the default speed
             routeData.forEach(function(point) {
                 point.speed = normalSpeed;
@@ -1573,8 +1581,6 @@
             table.setData(routeData);
             saveRouteData();
             updateTimeBudget();
-            
-            alert(`Updated all stations with speed ${normalSpeed} knots.`);
         });
         
         // Handle reset button
