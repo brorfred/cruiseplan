@@ -398,10 +398,10 @@
                 <div style="margin-bottom: 15px;">
                     <h4 style="font-size: 13px; color: #2c5aa0; margin-bottom: 8px;">Cruise Dates</h4>
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Cruise Start Date & Time:</label>
-                    <input type="text" id="setup-start-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: monospace;">
+                    <input type="text" id="setup-start-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif;">
                     
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Latest End Date & Time (deadline):</label>
-                    <input type="text" id="setup-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: monospace;">
+                    <input type="text" id="setup-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif;">
                     <small style="color: #6c757d; font-size: 11px;">Must arrive at final station by this date/time</small>
                 </div>
                 
@@ -421,7 +421,7 @@
             <span style="margin-left: 20px; margin-right: 8px;">|</span>
             
             <label for="latest-end-datetime">Latest End Date:</label>
-            <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 8px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 145px; font-family: monospace;">
+            <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 8px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 145px; font-family: Arial, sans-serif;">
         </div>
         <div id="data-table"></div>
         <div id="button-panel">
@@ -1322,7 +1322,7 @@
                             input.type = 'text';
                             input.value = value || '';
                             input.placeholder = 'YYYY-MM-DD HH:MM';
-                            input.style.fontFamily = 'monospace';
+                            input.style.fontFamily = 'Arial, sans-serif';
                             input.style.fontSize = '10px';
                             input.dataset.field = col.field;
                             input.dataset.rowIndex = rowIndex;
