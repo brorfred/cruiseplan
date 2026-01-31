@@ -1134,9 +1134,20 @@
                 });
             }
             
-            marker.bindPopup(`Station ${index + 1}${isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''}`);
+            marker.bindPopup(routeData[index].stationId + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''));
             
             return marker;
+        }
+        
+        // Update marker popups with current station names
+        function updateMarkerPopups() {
+            markers.forEach((marker, index) => {
+                if (marker && routeData[index]) {
+                    const isStartOrEnd = index === 0 || index === routeData.length - 1;
+                    const popupContent = routeData[index].stationId + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : '');
+                    marker.setPopupContent(popupContent);
+                }
+            });
         }
         
         // Update polyline
@@ -1273,8 +1284,12 @@
                     saveRouteData();
                     updateTimeBudget();
                 }
+            } else if (field === "stationId") {
+                // Update the marker popup when station name changes
+                updateMarkerPopups();
+                saveRouteData();
             } else {
-                // For other fields (stationId), just save
+                // For other fields (comments), just save
                 saveRouteData();
             }
         }
