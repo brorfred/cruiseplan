@@ -146,6 +146,11 @@
         .tabulator {
             font-size: 12px;
             border: none;
+            background: white;
+        }
+        
+        .tabulator-tableholder {
+            background: white;
         }
         
         .tabulator-header {
@@ -1473,10 +1478,10 @@
                     { field: 'lat', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
-                    { field: 'speed', width: '50px', editable: true, compact: true, flex: false },
+                    { field: 'speed', width: '40px', editable: true, compact: true, flex: false },
                     { field: 'arrival', width: '135px', editable: true, compact: false, flex: false },
                     { field: 'departure', width: '135px', editable: true, compact: false, flex: false },
-                    { field: 'duration', width: '70px', editable: true, compact: false, flex: false }
+                    { field: 'duration', width: '45px', editable: true, compact: false, flex: false }
                 ];
                 
                 columns.forEach(col => {
@@ -1647,7 +1652,7 @@
                 { 
                     title: "Spd<br><span style='font-size: 9px; font-weight: normal; text-transform: none;'>(kn)</span>", 
                     field: "speed", 
-                    width: 50, 
+                    width: 40, 
                     headerSort: false,
                     titleFormatter: "html"
                 },
@@ -1666,7 +1671,7 @@
                 { 
                     title: "On Stn<br><span style='font-size: 9px; font-weight: normal; text-transform: none;'>(hrs)</span>", 
                     field: "duration", 
-                    width: 70, 
+                    width: 45, 
                     headerSort: false,
                     titleFormatter: "html"
                 }
