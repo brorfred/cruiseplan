@@ -1454,7 +1454,7 @@
         table = new Tabulator("#data-table", {
             data: routeData,
             height: "100%",
-            layout: "fitData",
+            layout: "fitColumns",
             pagination: true,
             paginationSize: 10,
             paginationSizeSelector: [5, 10, 20, 50, 100],
@@ -1474,7 +1474,7 @@
                 
                 // Define columns with widths - MUST match header column widths exactly
                 const columns = [
-                    { field: 'stationId', width: '120px', editable: true, compact: false, flex: false },
+                    { field: 'stationId', width: '90px', editable: true, compact: false, flex: false },
                     { field: 'lat', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
