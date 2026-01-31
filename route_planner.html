@@ -1091,7 +1091,7 @@
                     updateDistances();
                     calculateTimes();
                     updatePolyline();
-                    table.setData(routeData);
+                    updateTableData();
                     saveRouteData();
                     updateTimeBudget();
                 }
@@ -1148,6 +1148,23 @@
                     marker.setPopupContent(popupContent);
                 }
             });
+        }
+        
+        // Update table data while preserving scroll position
+        function updateTableData() {
+            // Get current scroll position
+            const tableHolder = document.querySelector('.tabulator-tableholder');
+            const scrollTop = tableHolder ? tableHolder.scrollTop : 0;
+            
+            // Update data
+            table.setData(routeData);
+            
+            // Restore scroll position after a brief delay to ensure render is complete
+            setTimeout(() => {
+                if (tableHolder) {
+                    tableHolder.scrollTop = scrollTop;
+                }
+            }, 0);
         }
         
         // Update polyline
@@ -1255,19 +1272,19 @@
                 updateDistances();
                 calculateTimes();
                 updatePolyline();
-                table.setData(routeData);
+                updateTableData();
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "speed" || field === "duration") {
                 // Recalculate times when speed or duration changes
                 calculateTimes();
-                table.setData(routeData);
+                updateTableData();
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "departure") {
                 // When departure is manually edited, recalculate from this point forward
                 calculateTimesFromIndex(index);
-                table.setData(routeData);
+                updateTableData();
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "arrival") {
@@ -1280,7 +1297,7 @@
                         routeData[index].departure = formatDateTime(departureDate);
                     }
                     calculateTimesFromIndex(index);
-                    table.setData(routeData);
+                    updateTableData();
                     saveRouteData();
                     updateTimeBudget();
                 }
