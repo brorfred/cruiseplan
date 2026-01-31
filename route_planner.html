@@ -655,48 +655,6 @@
             });
         }
         
-        // Track used station IDs to prevent duplicates
-        let usedStationCodes = new Set();
-        
-        // Generate a unique random letter code (2 or 3 letters)
-        function generateUniqueStationCode() {
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let code;
-            let attempts = 0;
-            const maxAttempts = 10000;
-            
-            // Try 2-letter codes first
-            while (attempts < maxAttempts) {
-                const letter1 = letters[Math.floor(Math.random() * 26)];
-                const letter2 = letters[Math.floor(Math.random() * 26)];
-                code = letter1 + letter2;
-                
-                if (!usedStationCodes.has(code)) {
-                    usedStationCodes.add(code);
-                    return code;
-                }
-                attempts++;
-            }
-            
-            // If we've exhausted 2-letter combinations (676 total), use 3 letters
-            attempts = 0;
-            while (attempts < maxAttempts) {
-                const letter1 = letters[Math.floor(Math.random() * 26)];
-                const letter2 = letters[Math.floor(Math.random() * 26)];
-                const letter3 = letters[Math.floor(Math.random() * 26)];
-                code = letter1 + letter2 + letter3;
-                
-                if (!usedStationCodes.has(code)) {
-                    usedStationCodes.add(code);
-                    return code;
-                }
-                attempts++;
-            }
-            
-            // Fallback (should never happen)
-            return 'X' + Date.now().toString(36).toUpperCase();
-        }
-        
         // Load data from localStorage or use default
         let routeData = loadRouteData();
         
@@ -849,7 +807,7 @@
                 route.push({
                     id: i + 1,
                     stationId: stationId,
-                    uniqueCode: generateUniqueStationCode(),
+                    stationCode: generateStationCode(),
                     lat: lat,
                     lng: lng,
                     distance: 0,
@@ -1024,13 +982,10 @@
                 if (saved) {
                     const data = JSON.parse(saved);
                     
-                    // Rebuild usedStationCodes set and ensure all stations have unique codes
-                    usedStationCodes.clear();
+                    // Ensure all stations have station codes
                     data.forEach(station => {
-                        if (!station.uniqueCode) {
-                            station.uniqueCode = generateUniqueStationCode();
-                        } else {
-                            usedStationCodes.add(station.uniqueCode);
+                        if (!station.stationCode) {
+                            station.stationCode = generateStationCode();
                         }
                     });
                     
@@ -1040,11 +995,11 @@
                 console.error('Error loading from localStorage:', e);
             }
             
-            // Default data - ensure it has unique codes
+            // Default data - ensure it has station codes
             const data = JSON.parse(JSON.stringify(defaultRouteData));
             data.forEach(station => {
-                if (!station.uniqueCode) {
-                    station.uniqueCode = generateUniqueStationCode();
+                if (!station.stationCode) {
+                    station.stationCode = generateStationCode();
                 }
             });
             return data;
@@ -1270,7 +1225,7 @@
                 });
             }
             
-            marker.bindPopup(routeData[index].stationId + ' (' + routeData[index].uniqueCode + ')' + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''));
+            marker.bindPopup(routeData[index].stationId + ' (' + routeData[index].stationCode + ')' + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''));
             
             return marker;
         }
@@ -1331,7 +1286,7 @@
                     const newPoint = {
                         id: insertIndex + 1,
                         stationId: `Station-${insertIndex + 1}`,
-                        uniqueCode: generateUniqueStationCode(),
+                        stationCode: generateStationCode(),
                         lat: parseFloat(clickedLatLng.lat.toFixed(6)),
                         lng: parseFloat(clickedLatLng.lng.toFixed(6)),
                         distance: 0,
@@ -1528,7 +1483,7 @@
                             });
                             
                             const codeSpan = document.createElement('span');
-                            codeSpan.textContent = ' (' + data.uniqueCode + ')';
+                            codeSpan.textContent = ' (' + data.stationCode + ')';
                             codeSpan.style.fontSize = '10px';
                             codeSpan.style.color = '#6c757d';
                             codeSpan.style.fontWeight = '600';
