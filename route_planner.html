@@ -405,27 +405,54 @@
         
         /* Tabulator pagination styling */
         .tabulator-footer {
-            background: #f8f9fa;
-            border-top: 2px solid #2c5aa0;
-            padding: 8px 10px;
+            background: #2c5aa0;
+            border-top: 2px solid #1e3a6b;
+            padding: 10px 15px;
+            color: white;
         }
         
-        .tabulator-page {
-            background: white;
-            border: 1px solid #dee2e6;
-            color: #2c5aa0;
+        .tabulator-footer .tabulator-page-counter {
+            color: white;
             font-weight: 500;
         }
         
-        .tabulator-page.active {
-            background: #2c5aa0;
+        .tabulator-footer .tabulator-page-size {
             color: white;
-            border-color: #2c5aa0;
+            margin-right: 10px;
         }
         
-        .tabulator-page:hover:not(.disabled) {
-            background: #e7f3ff;
-            border-color: #2c5aa0;
+        .tabulator-footer select {
+            background: #1e3a6b;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-weight: 500;
+        }
+        
+        .tabulator-page {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-weight: 500;
+            margin: 0 2px;
+            border-radius: 4px;
+        }
+        
+        .tabulator-page.active {
+            background: #1e3a6b;
+            color: white;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .tabulator-page:not(.disabled):hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .tabulator-page.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
         
         /* Flatpickr datetime inputs in table - custom styling */
