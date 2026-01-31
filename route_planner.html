@@ -338,6 +338,31 @@
         .flatpickr-calendar.inline {
             font-size: 13px;
         }
+        
+        /* Tabulator pagination styling */
+        .tabulator-footer {
+            background: #f8f9fa;
+            border-top: 2px solid #2c5aa0;
+            padding: 8px 10px;
+        }
+        
+        .tabulator-page {
+            background: white;
+            border: 1px solid #dee2e6;
+            color: #2c5aa0;
+            font-weight: 500;
+        }
+        
+        .tabulator-page.active {
+            background: #2c5aa0;
+            color: white;
+            border-color: #2c5aa0;
+        }
+        
+        .tabulator-page:hover:not(.disabled) {
+            background: #e7f3ff;
+            border-color: #2c5aa0;
+        }
     </style>
 </head>
 <body>
@@ -1311,6 +1336,10 @@
             data: routeData,
             height: "100%",
             layout: "fitData",
+            pagination: true,
+            paginationSize: 10,
+            paginationSizeSelector: [5, 10, 20, 50, 100],
+            paginationCounter: "rows",
             rowFormatter: function(row) {
                 const data = row.getData();
                 const rowIndex = row.getPosition() - 1;
