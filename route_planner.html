@@ -201,6 +201,15 @@
             display: none;
         }
         
+        /* Split pill button hover effects */
+        .split-pill button:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+        
+        .split-pill button:active {
+            background: rgba(0, 0, 0, 0.1) !important;
+        }
+        
         /* Tabulator customization for compact look */
         .tabulator {
             font-size: 12px;
@@ -577,20 +586,22 @@
         <div id="button-panel">
             <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d);">Undo</button>
             
+            <!-- CSV Split Pill -->
             <div style="margin-left: 20px; display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
                 <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">CSV</div>
-                <div style="display: flex; gap: 8px;">
-                    <button id="download-csv" style="background: linear-gradient(to bottom, #34ce57, #28a745); padding: 7px 16px; font-size: 12px;">Download</button>
-                    <button id="upload-csv" style="background: linear-gradient(to bottom, #3db8d4, #17a2b8); padding: 7px 16px; font-size: 12px;">Upload</button>
+                <div class="split-pill" style="border-radius: 25px; display: inline-flex; background: linear-gradient(90deg, #28a745 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #17a2b8 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
+                    <button id="download-csv" style="background: transparent; border: none; border-radius: 25px 0 0 25px; padding: 7px 16px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Download</button>
+                    <button id="upload-csv" style="background: transparent; border: none; border-radius: 0 25px 25px 0; padding: 7px 16px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Upload</button>
                 </div>
             </div>
             <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
             
+            <!-- JSON Split Pill -->
             <div style="display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
                 <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">JSON</div>
-                <div style="display: flex; gap: 8px;">
-                    <button id="download-geojson" style="background: linear-gradient(to bottom, #8b5cf6, #6f42c1); padding: 7px 16px; font-size: 12px;">Download</button>
-                    <button id="upload-geojson" style="background: linear-gradient(to bottom, #8b5cf6, #6f42c1); padding: 7px 16px; font-size: 12px;">Upload</button>
+                <div class="split-pill" style="border-radius: 25px; display: inline-flex; background: linear-gradient(90deg, #8b5cf6 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #6f42c1 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
+                    <button id="download-geojson" style="background: transparent; border: none; border-radius: 25px 0 0 25px; padding: 7px 16px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Download</button>
+                    <button id="upload-geojson" style="background: transparent; border: none; border-radius: 0 25px 25px 0; padding: 7px 16px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Upload</button>
                 </div>
             </div>
             <input type="file" id="geojson-file-input" accept=".json,.geojson" style="display: none;">
