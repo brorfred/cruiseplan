@@ -1023,61 +1023,56 @@
         function createMarker(lat, lng, index) {
             const isStartOrEnd = (index === 0 || index === routeData.length - 1);
             
-            // Create SVG icon for round marker
-            const svgIcon = L.divIcon({
-                html: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10" cy="10" r="8" fill="${isStartOrEnd ? '#ff0000' : '#3388ff'}" stroke="#fff" stroke-width="2"/>
-                </svg>`,
-                className: 'svg-marker',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            });
+            let marker;
             
-            const marker = L.marker([lat, lng], {
-                icon: svgIcon,
-                draggable: true,
-                autoPan: true
-            }).addTo(map);
-            
-            marker.stationIndex = index;
-            
-            // Add number label for stations 2 onwards, but NOT for the last station
-            // (Show numbers only on intermediate waypoints)
+            // For intermediate stations (not first or last), use number label as the marker
             if (index > 0 && index < routeData.length - 1) {
-                const numberLabel = L.marker([lat, lng], {
+                marker = L.marker([lat, lng], {
                     icon: L.divIcon({
                         html: `<div style="
                             background: white;
                             border: 2px solid #3388ff;
                             border-radius: 50%;
-                            width: 24px;
-                            height: 24px;
+                            width: 28px;
+                            height: 28px;
                             display: flex;
                             align-items: center;
                             justify-content: center;
                             font-weight: bold;
-                            font-size: 12px;
+                            font-size: 13px;
                             color: #333;
                             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                            cursor: move;
                         ">${index}</div>`,
-                        className: 'number-label',
-                        iconSize: [24, 24],
-                        iconAnchor: [32, 12] // Position to the right of the marker
+                        className: 'number-marker',
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
                     }),
-                    interactive: false // Don't interfere with clicks
+                    draggable: true,
+                    autoPan: true
                 }).addTo(map);
+            } else {
+                // For start and end points, use traditional circular SVG marker
+                const svgIcon = L.divIcon({
+                    html: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="8" fill="#ff0000" stroke="#fff" stroke-width="2"/>
+                    </svg>`,
+                    className: 'svg-marker',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
                 
-                // Store the label reference so we can update/remove it
-                marker.numberLabel = numberLabel;
+                marker = L.marker([lat, lng], {
+                    icon: svgIcon,
+                    draggable: true,
+                    autoPan: true
+                }).addTo(map);
             }
+            
+            marker.stationIndex = index;
             
             marker.on('dragend', function(e) {
                 const newLatLng = e.target.getLatLng();
-                
-                // Update number label position if it exists
-                if (marker.numberLabel) {
-                    marker.numberLabel.setLatLng(newLatLng);
-                }
                 
                 // Find the current index of this marker in the markers array
                 const currentIndex = markers.indexOf(marker);
@@ -1225,13 +1220,8 @@
         
         // Initialize map with markers and polyline
         function initializeMap() {
-            // Clear existing markers and their number labels
-            markers.forEach(marker => {
-                if (marker.numberLabel) {
-                    map.removeLayer(marker.numberLabel);
-                }
-                map.removeLayer(marker);
-            });
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
             markers = [];
             
             // Create markers for each point
