@@ -537,17 +537,31 @@
         </div>
         <div id="data-table"></div>
         <div id="button-panel">
-            <button id="undo-btn" style="background: #6c757d;">Undo</button>
-            <button id="download-csv" style="background: #28a745;">Download CSV</button>
-            <button id="download-geojson" style="background: #6f42c1;">Download GeoJSON</button>
-            <button id="upload-csv" style="background: #17a2b8;">Upload CSV</button>
+            <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d);">Undo</button>
+            
+            <div style="margin-left: 20px; display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
+                <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">CSV</div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="download-csv" style="background: linear-gradient(to bottom, #34ce57, #28a745); padding: 7px 16px; font-size: 12px;">Download</button>
+                    <button id="upload-csv" style="background: linear-gradient(to bottom, #3db8d4, #17a2b8); padding: 7px 16px; font-size: 12px;">Upload</button>
+                </div>
+            </div>
             <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+            
+            <div style="display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
+                <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">JSON</div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="download-geojson" style="background: linear-gradient(to bottom, #8b5cf6, #6f42c1); padding: 7px 16px; font-size: 12px;">Download</button>
+                    <button id="upload-geojson" style="background: linear-gradient(to bottom, #8b5cf6, #6f42c1); padding: 7px 16px; font-size: 12px;">Upload</button>
+                </div>
+            </div>
+            <input type="file" id="geojson-file-input" accept=".json,.geojson" style="display: none;">
             
             <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
                 <div style="padding: 10px 20px; font-size: 14px; border-radius: 4px; min-width: 200px; text-align: center;" id="time-budget">
                     <strong>Time Budget:</strong> --
                 </div>
-                <button id="reset-data" style="background: #dc3545;">Reset All Data</button>
+                <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545);">Reset All Data</button>
             </div>
         </div>
     </div>
@@ -1818,6 +1832,72 @@
             const file = e.target.files[0];
             if (file) {
                 uploadCSV(file);
+            }
+            // Reset input so same file can be uploaded again
+            e.target.value = '';
+        });
+        
+        // Handle upload GeoJSON
+        document.getElementById('upload-geojson').addEventListener('click', function() {
+            document.getElementById('geojson-file-input').click();
+        });
+        
+        document.getElementById('geojson-file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const geojson = JSON.parse(event.target.result);
+                        
+                        if (!geojson.features || !Array.isArray(geojson.features)) {
+                            alert('Invalid GeoJSON format. Must contain a features array.');
+                            return;
+                        }
+                        
+                        // Save state before modification
+                        saveToHistory();
+                        
+                        // Extract coordinates from GeoJSON features
+                        const newRouteData = [];
+                        geojson.features.forEach((feature, index) => {
+                            if (feature.geometry && feature.geometry.type === 'Point') {
+                                const coords = feature.geometry.coordinates; // [lng, lat]
+                                const props = feature.properties || {};
+                                
+                                newRouteData.push({
+                                    id: index + 1,
+                                    stationId: props.stationId || props.name || `Station-${index + 1}`,
+                                    stationCode: generateStationCode(),
+                                    lat: coords[1], // GeoJSON uses [lng, lat]
+                                    lng: coords[0],
+                                    distance: parseFloat(props.distance) || 0,
+                                    speed: props.speed || '8',
+                                    arrival: props.arrival || '',
+                                    departure: props.departure || '',
+                                    duration: props.duration || '0',
+                                    comments: props.comments || ''
+                                });
+                            }
+                        });
+                        
+                        if (newRouteData.length > 0) {
+                            routeData = newRouteData;
+                            updateDistances();
+                            calculateTimes();
+                            initializeMap();
+                            updateTableData();
+                            saveRouteData();
+                            updateTimeBudget();
+                            alert(`Successfully imported ${newRouteData.length} stations from GeoJSON.`);
+                        } else {
+                            alert('No valid Point features found in GeoJSON file.');
+                        }
+                    } catch (error) {
+                        alert('Error reading GeoJSON file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
             }
             // Reset input so same file can be uploaded again
             e.target.value = '';
