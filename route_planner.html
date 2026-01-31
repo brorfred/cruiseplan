@@ -1041,13 +1041,14 @@
             
             marker.stationIndex = index;
             
-            // Add number label for station 2 onwards (not for first station)
-            if (index > 0) {
+            // Add number label for stations 2 onwards, but NOT for the last station
+            // (Show numbers only on intermediate waypoints)
+            if (index > 0 && index < routeData.length - 1) {
                 const numberLabel = L.marker([lat, lng], {
                     icon: L.divIcon({
                         html: `<div style="
                             background: white;
-                            border: 2px solid ${isStartOrEnd ? '#ff0000' : '#3388ff'};
+                            border: 2px solid #3388ff;
                             border-radius: 50%;
                             width: 24px;
                             height: 24px;
