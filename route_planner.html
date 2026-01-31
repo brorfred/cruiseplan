@@ -613,8 +613,102 @@
             }
         ];
         
+        // Generate unique station ID (2 letters, or 3 if exhausted)
+        const usedStationCodes = new Set();
+        
+        function generateStationCode() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            // Try 2-letter combinations first (676 possibilities)
+            if (usedStationCodes.size < 676) {
+                let code;
+                do {
+                    const letter1 = letters[Math.floor(Math.random() * 26)];
+                    const letter2 = letters[Math.floor(Math.random() * 26)];
+                    code = letter1 + letter2;
+                } while (usedStationCodes.has(code));
+                
+                usedStationCodes.add(code);
+                return code;
+            }
+            
+            // If 2-letter codes exhausted, use 3-letter codes (17,576 possibilities)
+            let code;
+            do {
+                const letter1 = letters[Math.floor(Math.random() * 26)];
+                const letter2 = letters[Math.floor(Math.random() * 26)];
+                const letter3 = letters[Math.floor(Math.random() * 26)];
+                code = letter1 + letter2 + letter3;
+            } while (usedStationCodes.has(code));
+            
+            usedStationCodes.add(code);
+            return code;
+        }
+        
+        // Initialize station codes from existing data
+        function initializeStationCodes() {
+            usedStationCodes.clear();
+            routeData.forEach(station => {
+                if (station.stationCode) {
+                    usedStationCodes.add(station.stationCode);
+                }
+            });
+        }
+        
+        // Track used station IDs to prevent duplicates
+        let usedStationCodes = new Set();
+        
+        // Generate a unique random letter code (2 or 3 letters)
+        function generateUniqueStationCode() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let code;
+            let attempts = 0;
+            const maxAttempts = 10000;
+            
+            // Try 2-letter codes first
+            while (attempts < maxAttempts) {
+                const letter1 = letters[Math.floor(Math.random() * 26)];
+                const letter2 = letters[Math.floor(Math.random() * 26)];
+                code = letter1 + letter2;
+                
+                if (!usedStationCodes.has(code)) {
+                    usedStationCodes.add(code);
+                    return code;
+                }
+                attempts++;
+            }
+            
+            // If we've exhausted 2-letter combinations (676 total), use 3 letters
+            attempts = 0;
+            while (attempts < maxAttempts) {
+                const letter1 = letters[Math.floor(Math.random() * 26)];
+                const letter2 = letters[Math.floor(Math.random() * 26)];
+                const letter3 = letters[Math.floor(Math.random() * 26)];
+                code = letter1 + letter2 + letter3;
+                
+                if (!usedStationCodes.has(code)) {
+                    usedStationCodes.add(code);
+                    return code;
+                }
+                attempts++;
+            }
+            
+            // Fallback (should never happen)
+            return 'X' + Date.now().toString(36).toUpperCase();
+        }
+        
         // Load data from localStorage or use default
         let routeData = loadRouteData();
+        
+        // Initialize station codes from existing data
+        initializeStationCodes();
+        
+        // Ensure all stations have station codes
+        routeData.forEach(station => {
+            if (!station.stationCode) {
+                station.stationCode = generateStationCode();
+            }
+        });
         
         // Check if this is first time setup
         let isFirstSetup = !localStorage.getItem('shipRouteData');
@@ -755,6 +849,7 @@
                 route.push({
                     id: i + 1,
                     stationId: stationId,
+                    uniqueCode: generateUniqueStationCode(),
                     lat: lat,
                     lng: lng,
                     distance: 0,
@@ -927,12 +1022,32 @@
             try {
                 const saved = localStorage.getItem('shipRouteData');
                 if (saved) {
-                    return JSON.parse(saved);
+                    const data = JSON.parse(saved);
+                    
+                    // Rebuild usedStationCodes set and ensure all stations have unique codes
+                    usedStationCodes.clear();
+                    data.forEach(station => {
+                        if (!station.uniqueCode) {
+                            station.uniqueCode = generateUniqueStationCode();
+                        } else {
+                            usedStationCodes.add(station.uniqueCode);
+                        }
+                    });
+                    
+                    return data;
                 }
             } catch (e) {
                 console.error('Error loading from localStorage:', e);
             }
-            return JSON.parse(JSON.stringify(defaultRouteData)); // Return a copy of default data
+            
+            // Default data - ensure it has unique codes
+            const data = JSON.parse(JSON.stringify(defaultRouteData));
+            data.forEach(station => {
+                if (!station.uniqueCode) {
+                    station.uniqueCode = generateUniqueStationCode();
+                }
+            });
+            return data;
         }
         
         function resetRouteData() {
@@ -1155,7 +1270,7 @@
                 });
             }
             
-            marker.bindPopup(routeData[index].stationId + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''));
+            marker.bindPopup(routeData[index].stationId + ' (' + routeData[index].uniqueCode + ')' + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''));
             
             return marker;
         }
@@ -1165,7 +1280,7 @@
             markers.forEach((marker, index) => {
                 if (marker && routeData[index]) {
                     const isStartOrEnd = index === 0 || index === routeData.length - 1;
-                    const popupContent = routeData[index].stationId + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : '');
+                    const popupContent = routeData[index].stationId + ' (' + routeData[index].stationCode + ')' + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : '');
                     marker.setPopupContent(popupContent);
                 }
             });
@@ -1216,6 +1331,7 @@
                     const newPoint = {
                         id: insertIndex + 1,
                         stationId: `Station-${insertIndex + 1}`,
+                        uniqueCode: generateUniqueStationCode(),
                         lat: parseFloat(clickedLatLng.lat.toFixed(6)),
                         lng: parseFloat(clickedLatLng.lng.toFixed(6)),
                         distance: 0,
@@ -1355,7 +1471,7 @@
                 
                 // Define columns with widths - MUST match header column widths exactly
                 const columns = [
-                    { field: 'stationId', width: '90px', editable: true, compact: false, flex: false },
+                    { field: 'stationId', width: '120px', editable: true, compact: false, flex: false },
                     { field: 'lat', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
@@ -1388,8 +1504,43 @@
                     const value = col.formatter ? col.formatter(data[col.field]) : data[col.field];
                     
                     if (isEditable) {
+                        // Special handling for stationId - show with code but only allow editing name
+                        if (col.field === 'stationId') {
+                            const container = document.createElement('div');
+                            container.style.display = 'flex';
+                            container.style.alignItems = 'center';
+                            container.style.gap = '4px';
+                            
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = value || '';
+                            input.style.flex = '1';
+                            input.style.minWidth = '0';
+                            input.dataset.field = col.field;
+                            input.dataset.rowIndex = rowIndex;
+                            
+                            input.addEventListener('change', function() {
+                                // Save state before modification
+                                saveToHistory();
+                                
+                                routeData[rowIndex][col.field] = this.value;
+                                handleFieldUpdate(col.field, rowIndex);
+                            });
+                            
+                            const codeSpan = document.createElement('span');
+                            codeSpan.textContent = ' (' + data.uniqueCode + ')';
+                            codeSpan.style.fontSize = '10px';
+                            codeSpan.style.color = '#6c757d';
+                            codeSpan.style.fontWeight = '600';
+                            codeSpan.style.whiteSpace = 'nowrap';
+                            codeSpan.style.marginLeft = '4px';
+                            
+                            container.appendChild(input);
+                            container.appendChild(codeSpan);
+                            cell.appendChild(container);
+                        }
                         // Use flatpickr for arrival and departure fields
-                        if (col.field === 'arrival' || col.field === 'departure') {
+                        else if (col.field === 'arrival' || col.field === 'departure') {
                             const input = document.createElement('input');
                             input.type = 'text';
                             input.value = value || '';
