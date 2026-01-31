@@ -398,10 +398,10 @@
                 <div style="margin-bottom: 15px;">
                     <h4 style="font-size: 13px; color: #2c5aa0; margin-bottom: 8px;">Cruise Dates</h4>
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Cruise Start Date & Time:</label>
-                    <input type="text" id="setup-start-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif;">
+                    <input type="text" id="setup-start-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 160px; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif; font-size: 13px;">
                     
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Latest End Date & Time (deadline):</label>
-                    <input type="text" id="setup-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif;">
+                    <input type="text" id="setup-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 160px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif; font-size: 13px;">
                     <small style="color: #6c757d; font-size: 11px;">Must arrive at final station by this date/time</small>
                 </div>
                 
@@ -421,7 +421,7 @@
             <span style="margin-left: 20px; margin-right: 8px;">|</span>
             
             <label for="latest-end-datetime">Latest End Date:</label>
-            <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 8px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 13px; width: 145px; font-family: Arial, sans-serif;">
+            <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 12px; width: 130px; font-family: Arial, sans-serif;">
         </div>
         <div id="data-table"></div>
         <div id="button-panel">
@@ -1331,8 +1331,8 @@
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
                     { field: 'speed', width: '50px', editable: true, compact: true, flex: false },
-                    { field: 'arrival', width: '150px', editable: true, compact: false, flex: false },
-                    { field: 'departure', width: '150px', editable: true, compact: false, flex: false },
+                    { field: 'arrival', width: '135px', editable: true, compact: false, flex: false },
+                    { field: 'departure', width: '135px', editable: true, compact: false, flex: false },
                     { field: 'duration', width: '70px', editable: true, compact: false, flex: false }
                 ];
                 
@@ -1366,7 +1366,9 @@
                             input.value = value || '';
                             input.placeholder = 'YYYY-MM-DD HH:MM';
                             input.style.fontFamily = 'Arial, sans-serif';
-                            input.style.fontSize = '10px';
+                            input.style.fontSize = '11px';
+                            input.style.padding = '2px 4px';
+                            input.style.width = '100%';
                             input.dataset.field = col.field;
                             input.dataset.rowIndex = rowIndex;
                             
@@ -1473,13 +1475,13 @@
                 { 
                     title: "Arrival", 
                     field: "arrival", 
-                    width: 150,
+                    width: 135,
                     headerSort: false 
                 },
                 { 
                     title: "Departure", 
                     field: "departure", 
-                    width: 150,
+                    width: 135,
                     headerSort: false 
                 },
                 { 
