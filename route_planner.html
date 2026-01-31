@@ -566,6 +566,14 @@
             <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 12px; width: 130px; font-family: Arial, sans-serif;">
         </div>
         <div id="data-table"></div>
+        <!-- Time Budget Bar -->
+        <div id="time-budget-bar" style="background: #2c5aa0; padding: 8px 0; text-align: center; border-top: 1px solid #1e3a6b;">
+            <div id="time-budget" style="display: inline-block; width: 66%; padding: 8px 20px; border-radius: 4px; font-size: 14px; font-weight: 600; color: white;">
+                <strong>Time Budget:</strong> --
+            </div>
+        </div>
+        
+        <!-- Button Panel -->
         <div id="button-panel">
             <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d);">Undo</button>
             
@@ -587,12 +595,7 @@
             </div>
             <input type="file" id="geojson-file-input" accept=".json,.geojson" style="display: none;">
             
-            <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
-                <div style="padding: 10px 20px; font-size: 14px; border-radius: 4px; min-width: 200px; text-align: center;" id="time-budget">
-                    <strong>Time Budget:</strong> --
-                </div>
-                <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545);">Reset All Data</button>
-            </div>
+            <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545); margin-left: auto;">Reset All Data</button>
         </div>
     </div>
 
@@ -861,13 +864,15 @@
             if (!latestEndDate) {
                 budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
                 budgetSpan.style.backgroundColor = 'transparent';
-                budgetSpan.style.color = 'inherit';
+                budgetSpan.style.color = 'white';
                 return;
             }
             
             // Get the last station's arrival time
             if (routeData.length === 0) {
                 budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                budgetSpan.style.backgroundColor = 'transparent';
+                budgetSpan.style.color = 'white';
                 return;
             }
             
@@ -878,7 +883,7 @@
             if (!arrivalTime) {
                 budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
                 budgetSpan.style.backgroundColor = 'transparent';
-                budgetSpan.style.color = 'inherit';
+                budgetSpan.style.color = 'white';
                 return;
             }
             
@@ -900,13 +905,13 @@
             
             budgetSpan.innerHTML = `<strong>Time Budget:</strong> ${budgetText}`;
             
-            // Color code: green if positive (on time), red if negative (late)
+            // Darker colors with white text
             if (diffHours >= 0) {
-                budgetSpan.style.backgroundColor = '#d4edda';
-                budgetSpan.style.color = '#155724';
+                budgetSpan.style.backgroundColor = '#1e7e34'; // Dark green
+                budgetSpan.style.color = 'white';
             } else {
-                budgetSpan.style.backgroundColor = '#f8d7da';
-                budgetSpan.style.color = '#721c24';
+                budgetSpan.style.backgroundColor = '#bd2130'; // Dark red
+                budgetSpan.style.color = 'white';
             }
         }
         
