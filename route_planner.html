@@ -1663,7 +1663,7 @@
                 
                 // Define columns with widths - MUST match header column widths exactly
                 const columns = [
-                    { field: 'stationId', width: '110px', editable: true, compact: false, flex: false },
+                    { field: 'stationId', width: '130px', editable: true, compact: false, flex: false },
                     { field: 'lat', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
@@ -1816,7 +1816,7 @@
                 rowEl.appendChild(container);
             },
             columns: [
-                { title: "Station", field: "stationId", width: 110, headerSort: false },
+                { title: "Station", field: "stationId", width: 130, headerSort: false },
                 { 
                     title: "Lat<br><span style='font-size: 9px; font-weight: normal; text-transform: none;'>(decimal)</span>", 
                     field: "lat", 
