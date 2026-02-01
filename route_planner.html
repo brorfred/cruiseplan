@@ -1794,6 +1794,16 @@
                                     
                                     routeData[rowIndex][col.field] = dateStr;
                                     handleFieldUpdate(col.field, rowIndex);
+                                },
+                                onClose: function(selectedDates, dateStr, instance) {
+                                    // Ensure value is saved when calendar closes
+                                    if (dateStr && dateStr !== routeData[rowIndex][col.field]) {
+                                        saveToHistory();
+                                        routeData[rowIndex][col.field] = dateStr;
+                                        handleFieldUpdate(col.field, rowIndex);
+                                    }
+                                    // Update the input value to reflect the selected date
+                                    input.value = dateStr;
                                 }
                             });
                             
