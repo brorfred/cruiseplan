@@ -584,15 +584,15 @@
         
         <!-- Button Panel -->
         <div id="button-panel">
-            <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d);">Undo</button>
+            <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d); height: 30px; padding: 0 20px;">Undo</button>
             
             <!-- CSV Split Pill -->
             <div style="margin-left: 20px; display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
                 <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">CSV</div>
-                <div class="split-pill" style="border-radius: 25px; padding: 7px 16px; display: inline-flex; background: linear-gradient(90deg, #28a745 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #17a2b8 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
-                    <button id="download-csv" style="background: transparent; border: none; padding: 0 8px 0 0; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Download</button>
-                    <div style="width: 1px; background: rgba(255,255,255,0.3); margin: 0 4px;"></div>
-                    <button id="upload-csv" style="background: transparent; border: none; padding: 0 0 0 8px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Upload</button>
+                <div class="split-pill" style="border-radius: 25px; padding: 0 16px; height: 30px; display: inline-flex; align-items: center; background: linear-gradient(90deg, #28a745 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #17a2b8 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
+                    <button id="download-csv-btn" style="background: transparent; border: none; padding: 0 8px 0 0; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Download</button>
+                    <div style="width: 1px; background: rgba(255,255,255,0.3); height: 60%; margin: 0 4px;"></div>
+                    <button id="upload-csv-btn" style="background: transparent; border: none; padding: 0 0 0 8px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Upload</button>
                 </div>
             </div>
             <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
@@ -600,15 +600,15 @@
             <!-- JSON Split Pill -->
             <div style="display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
                 <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">JSON</div>
-                <div class="split-pill" style="border-radius: 25px; padding: 7px 16px; display: inline-flex; background: linear-gradient(90deg, #8b5cf6 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #6f42c1 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
-                    <button id="download-geojson" style="background: transparent; border: none; padding: 0 8px 0 0; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Download</button>
-                    <div style="width: 1px; background: rgba(255,255,255,0.3); margin: 0 4px;"></div>
-                    <button id="upload-geojson" style="background: transparent; border: none; padding: 0 0 0 8px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s;">Upload</button>
+                <div class="split-pill" style="border-radius: 25px; padding: 0 16px; height: 30px; display: inline-flex; align-items: center; background: linear-gradient(90deg, #8b5cf6 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #6f42c1 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
+                    <button id="download-geojson-btn" style="background: transparent; border: none; padding: 0 8px 0 0; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Download</button>
+                    <div style="width: 1px; background: rgba(255,255,255,0.3); height: 60%; margin: 0 4px;"></div>
+                    <button id="upload-geojson-btn" style="background: transparent; border: none; padding: 0 0 0 8px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Upload</button>
                 </div>
             </div>
             <input type="file" id="geojson-file-input" accept=".json,.geojson" style="display: none;">
             
-            <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545); margin-left: auto;">Reset All Data</button>
+            <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545); margin-left: auto; height: 30px; padding: 0 20px;">Reset All Data</button>
         </div>
     </div>
 
@@ -1862,17 +1862,17 @@
         });
         
         // Handle download CSV
-        document.getElementById('download-csv').addEventListener('click', function() {
+        document.getElementById('download-csv-btn').addEventListener('click', function() {
             downloadCSV();
         });
         
         // Handle download GeoJSON
-        document.getElementById('download-geojson').addEventListener('click', function() {
+        document.getElementById('download-geojson-btn').addEventListener('click', function() {
             downloadGeoJSON();
         });
         
         // Handle upload CSV
-        document.getElementById('upload-csv').addEventListener('click', function() {
+        document.getElementById('upload-csv-btn').addEventListener('click', function() {
             document.getElementById('csv-file-input').click();
         });
         
@@ -1886,7 +1886,7 @@
         });
         
         // Handle upload GeoJSON
-        document.getElementById('upload-geojson').addEventListener('click', function() {
+        document.getElementById('upload-geojson-btn').addEventListener('click', function() {
             document.getElementById('geojson-file-input').click();
         });
         
