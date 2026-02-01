@@ -1782,7 +1782,7 @@
                             input.dataset.rowIndex = rowIndex;
                             
                             // Initialize flatpickr
-                            flatpickr(input, {
+                            const fp = flatpickr(input, {
                                 enableTime: true,
                                 dateFormat: "Y-m-d H:i",
                                 time_24hr: true,
@@ -1804,6 +1804,16 @@
                                     }
                                     // Update the input value to reflect the selected date
                                     input.value = dateStr;
+                                }
+                            });
+                            
+                            // Handle manual text entry
+                            input.addEventListener('blur', function() {
+                                const value = this.value;
+                                if (value && value !== routeData[rowIndex][col.field]) {
+                                    saveToHistory();
+                                    routeData[rowIndex][col.field] = value;
+                                    handleFieldUpdate(col.field, rowIndex);
                                 }
                             });
                             
