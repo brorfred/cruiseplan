@@ -1815,26 +1815,16 @@
                                 dateFormat: "Y-m-d H:i",
                                 time_24hr: true,
                                 minuteIncrement: 1,
-                                allowInput: true
-                            });
-                            
-                            // Handle all changes (calendar, manual typing, etc)
-                            input.addEventListener('change', function() {
-                                const newValue = this.value;
-                                if (newValue !== routeData[rowIndex][col.field]) {
-                                    saveToHistory();
-                                    routeData[rowIndex][col.field] = newValue;
-                                    handleFieldUpdate(col.field, rowIndex);
-                                }
-                            });
-                            
-                            // Also handle blur for manual typing
-                            input.addEventListener('blur', function() {
-                                const newValue = this.value;
-                                if (newValue !== routeData[rowIndex][col.field]) {
-                                    saveToHistory();
-                                    routeData[rowIndex][col.field] = newValue;
-                                    handleFieldUpdate(col.field, rowIndex);
+                                allowInput: true,
+                                onClose: function(selectedDates, dateStr, instance) {
+                                    console.log('Flatpickr onClose:', dateStr, 'rowIndex:', rowIndex, 'field:', col.field);
+                                    if (dateStr) {
+                                        saveToHistory();
+                                        routeData[rowIndex][col.field] = dateStr;
+                                        input.value = dateStr; // Explicitly set the input value
+                                        handleFieldUpdate(col.field, rowIndex);
+                                        console.log('Updated routeData[' + rowIndex + '][' + col.field + '] =', dateStr);
+                                    }
                                 }
                             });
                             
