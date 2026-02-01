@@ -599,8 +599,7 @@
         <!-- Time Budget Bar (moved here from below table) -->
         <div id="time-budget-bar" style="background: #2c5aa0; padding: 0; text-align: right; border-top: 1px solid #1e3a6b; border-bottom: 1px solid #1e3a6b; display: flex; justify-content: flex-end; align-items: stretch; gap: 15px;">
             <!-- Marker Display Toggle -->
-            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 15px;">
-                <span style="color: white; font-size: 12px; font-weight: 600;">Show:</span>
+            <div style="display: flex; align-items: center; padding: 8px 15px;">
                 <div style="display: flex; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
                     <button id="marker-toggle-id" style="padding: 4px 12px; background: #1e3a6b; color: white; border: none; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">ID</button>
                     <button id="marker-toggle-num" style="padding: 4px 12px; background: transparent; color: rgba(255,255,255,0.6); border: none; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">#</button>
@@ -1377,7 +1376,7 @@
             
             // For intermediate stations (not first or last), use number label or ID as the marker
             if (index > 0 && index < routeData.length - 1) {
-                const displayText = markerDisplayMode === 'id' ? point.stationCode : index;
+                const displayText = markerDisplayMode === 'id' ? (point.stationCode || 'XX') : index;
                 
                 marker = L.marker([lat, lng], {
                     icon: L.divIcon({
@@ -1391,7 +1390,7 @@
                             align-items: center;
                             justify-content: center;
                             font-weight: bold;
-                            font-size: ${markerDisplayMode === 'id' ? '11px' : '13px'};
+                            font-size: ${markerDisplayMode === 'id' ? '10px' : '13px'};
                             color: #333;
                             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                             cursor: move;
