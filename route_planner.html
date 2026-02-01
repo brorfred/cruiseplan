@@ -1516,27 +1516,36 @@
         
         // Update specific cells without re-rendering entire table
         function updateCellValues(startIndex) {
+            console.log('updateCellValues called with startIndex:', startIndex);
             // Update all rows from startIndex forward with new calculated values
             for (let i = startIndex; i < routeData.length; i++) {
                 const rowData = routeData[i];
                 
                 // Find all inputs for this row and update their values
                 const rowElement = document.querySelector(`[data-row-index="${i}"]`)?.closest('.custom-row-container');
+                console.log('Row element for index', i, ':', rowElement);
+                
                 if (rowElement) {
                     // Update arrival input
                     const arrivalInput = rowElement.querySelector(`input[data-field="arrival"][data-row-index="${i}"]`);
+                    console.log('Arrival input for index', i, ':', arrivalInput, 'value:', rowData.arrival);
                     if (arrivalInput && arrivalInput._flatpickr) {
                         arrivalInput._flatpickr.setDate(rowData.arrival, false);
+                        console.log('Set flatpickr date for arrival:', rowData.arrival);
                     } else if (arrivalInput) {
                         arrivalInput.value = rowData.arrival || '';
+                        console.log('Set input value for arrival:', rowData.arrival);
                     }
                     
                     // Update departure input
                     const departureInput = rowElement.querySelector(`input[data-field="departure"][data-row-index="${i}"]`);
+                    console.log('Departure input for index', i, ':', departureInput, 'value:', rowData.departure);
                     if (departureInput && departureInput._flatpickr) {
                         departureInput._flatpickr.setDate(rowData.departure, false);
+                        console.log('Set flatpickr date for departure:', rowData.departure);
                     } else if (departureInput) {
                         departureInput.value = rowData.departure || '';
+                        console.log('Set input value for departure:', rowData.departure);
                     }
                 }
             }
