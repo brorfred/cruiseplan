@@ -1681,8 +1681,9 @@
                         const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
                         routeData[index].departure = formatDateTime(departureDate);
                     }
-                    calculateTimesFromIndex(index);
-                    updateCellValues(index); // Update this row and subsequent rows
+                    // Recalculate times AFTER this station (not including it)
+                    calculateTimesFromIndex(index + 1);
+                    updateCellValues(index); // Update this row's departure and subsequent rows
                     saveRouteData();
                     updateTimeBudget();
                 }
