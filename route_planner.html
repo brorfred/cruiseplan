@@ -416,6 +416,7 @@
         .tabulator-footer {
             background: #2c5aa0 !important;
             border-top: 2px solid #1e3a6b !important;
+            border-bottom: none !important;
             padding: 6px 15px !important;
             color: white !important;
         }
@@ -594,13 +595,15 @@
             <label for="latest-end-datetime">Latest End Date:</label>
             <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 12px; width: 130px; font-family: Arial, sans-serif;">
         </div>
-        <div id="data-table"></div>
-        <!-- Time Budget Bar -->
-        <div id="time-budget-bar" style="background: #2c5aa0; padding: 8px 0; text-align: center; border-top: 1px solid #1e3a6b;">
+        
+        <!-- Time Budget Bar (moved here from below table) -->
+        <div id="time-budget-bar" style="background: #2c5aa0; padding: 8px 0; text-align: center; border-top: 1px solid #1e3a6b; border-bottom: 1px solid #1e3a6b;">
             <div id="time-budget" style="display: inline-block; width: 66%; padding: 8px 20px; border-radius: 4px; font-size: 14px; font-weight: 600; color: white;">
                 <strong>Time Budget:</strong> --
             </div>
         </div>
+        
+        <div id="data-table"></div>
         
         <!-- Button Panel -->
         <div id="button-panel">
