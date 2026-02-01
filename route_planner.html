@@ -584,7 +584,11 @@
         
         <!-- Button Panel -->
         <div id="button-panel">
-            <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d); height: 30px; padding: 0 20px;">Undo</button>
+            <!-- Undo with spacer -->
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 10px; font-weight: 600; color: transparent; margin-bottom: 4px; letter-spacing: 0.5px; visibility: hidden;">X</div>
+                <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d); height: 30px; padding: 0 20px;">Undo</button>
+            </div>
             
             <!-- CSV Split Pill -->
             <div style="margin-left: 20px; display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
@@ -608,7 +612,11 @@
             </div>
             <input type="file" id="geojson-file-input" accept=".json,.geojson" style="display: none;">
             
-            <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545); margin-left: auto; height: 30px; padding: 0 20px;">Reset All Data</button>
+            <!-- Reset with spacer -->
+            <div style="margin-left: auto; display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 10px; font-weight: 600; color: transparent; margin-bottom: 4px; letter-spacing: 0.5px; visibility: hidden;">X</div>
+                <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545); height: 30px; padding: 0 20px;">Reset All Data</button>
+            </div>
         </div>
     </div>
 
