@@ -1809,38 +1809,31 @@
                             input.dataset.field = col.field;
                             input.dataset.rowIndex = rowIndex;
                             
-                            // Initialize flatpickr
-                            const fp = flatpickr(input, {
+                            // Initialize flatpickr and store instance on input
+                            input._flatpickr = flatpickr(input, {
                                 enableTime: true,
                                 dateFormat: "Y-m-d H:i",
                                 time_24hr: true,
                                 minuteIncrement: 1,
-                                allowInput: true,
-                                onChange: function(selectedDates, dateStr, instance) {
-                                    // Save state before modification
+                                allowInput: true
+                            });
+                            
+                            // Handle all changes (calendar, manual typing, etc)
+                            input.addEventListener('change', function() {
+                                const newValue = this.value;
+                                if (newValue !== routeData[rowIndex][col.field]) {
                                     saveToHistory();
-                                    
-                                    routeData[rowIndex][col.field] = dateStr;
+                                    routeData[rowIndex][col.field] = newValue;
                                     handleFieldUpdate(col.field, rowIndex);
-                                },
-                                onClose: function(selectedDates, dateStr, instance) {
-                                    // Ensure value is saved when calendar closes
-                                    if (dateStr && dateStr !== routeData[rowIndex][col.field]) {
-                                        saveToHistory();
-                                        routeData[rowIndex][col.field] = dateStr;
-                                        handleFieldUpdate(col.field, rowIndex);
-                                    }
-                                    // Update the input value to reflect the selected date
-                                    input.value = dateStr;
                                 }
                             });
                             
-                            // Handle manual text entry
+                            // Also handle blur for manual typing
                             input.addEventListener('blur', function() {
-                                const value = this.value;
-                                if (value && value !== routeData[rowIndex][col.field]) {
+                                const newValue = this.value;
+                                if (newValue !== routeData[rowIndex][col.field]) {
                                     saveToHistory();
-                                    routeData[rowIndex][col.field] = value;
+                                    routeData[rowIndex][col.field] = newValue;
                                     handleFieldUpdate(col.field, rowIndex);
                                 }
                             });
