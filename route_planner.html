@@ -1921,19 +1921,25 @@
                                 const coords = feature.geometry.coordinates; // [lng, lat]
                                 const props = feature.properties || {};
                                 
+                                // Use stationCode from file if available, otherwise generate new one
+                                const stationCode = props.stationCode || generateStationCode();
+                                
                                 newRouteData.push({
                                     id: index + 1,
                                     stationId: props.stationId || props.name || `Station-${index + 1}`,
-                                    stationCode: generateStationCode(),
+                                    stationCode: stationCode,
                                     lat: coords[1], // GeoJSON uses [lng, lat]
                                     lng: coords[0],
                                     distance: parseFloat(props.distance) || 0,
                                     speed: props.speed || '8',
-                                    arrival: props.arrival || '',
+                                    arrival: props.arrival || props.arrive || '',
                                     departure: props.departure || '',
                                     duration: props.duration || '0',
                                     comments: props.comments || ''
                                 });
+                                
+                                // Track the station code
+                                usedStationCodes.add(stationCode);
                             }
                         });
                         
@@ -1961,13 +1967,14 @@
         
         // Download route data as CSV
         function downloadCSV() {
-            const headers = ['Station ID', 'Latitude', 'Longitude', 'Distance (nm)', 'Speed (knots)', 'Arrival', 'Departure', 'Duration (hrs)', 'Comments'];
+            const headers = ['Station ID', 'Station Code', 'Latitude', 'Longitude', 'Distance (nm)', 'Speed (knots)', 'Arrival', 'Departure', 'Duration (hrs)', 'Comments'];
             
             let csv = headers.join(',') + '\n';
             
             routeData.forEach(function(point) {
                 const row = [
                     escapeCSV(point.stationId),
+                    escapeCSV(point.stationCode),
                     point.lat,
                     point.lng,
                     point.distance,
@@ -2006,11 +2013,14 @@
                         },
                         "properties": {
                             "name": point.stationId,
+                            "stationCode": point.stationCode,
+                            "distance": point.distance,
+                            "speed": point.speed,
                             "arrive": point.arrival || "",
                             "departure": point.departure || "",
+                            "duration": point.duration || "",
                             "comments": point.comments || "",
-                            "depth": "",
-                            "duration": point.duration || ""
+                            "depth": ""
                         }
                     };
                 })
@@ -2046,19 +2056,28 @@
                     dataLines.forEach(function(line, index) {
                         const values = parseCSVLine(line);
                         
+                        // Support both old format (9 columns) and new format (10 columns with Station Code)
                         if (values.length >= 9) {
+                            const hasStationCode = values.length >= 10;
+                            
                             newRouteData.push({
                                 id: index + 1,
                                 stationId: values[0] || `Station-${index + 1}`,
-                                lat: parseFloat(values[1]) || 0,
-                                lng: parseFloat(values[2]) || 0,
-                                distance: parseFloat(values[3]) || 0,
-                                speed: values[4] || '8',
-                                arrival: values[5] || '',
-                                departure: values[6] || '',
-                                duration: values[7] || '0',
-                                comments: values[8] || ''
+                                stationCode: hasStationCode && values[1] ? values[1] : generateStationCode(),
+                                lat: parseFloat(values[hasStationCode ? 2 : 1]) || 0,
+                                lng: parseFloat(values[hasStationCode ? 3 : 2]) || 0,
+                                distance: parseFloat(values[hasStationCode ? 4 : 3]) || 0,
+                                speed: values[hasStationCode ? 5 : 4] || '8',
+                                arrival: values[hasStationCode ? 6 : 5] || '',
+                                departure: values[hasStationCode ? 7 : 6] || '',
+                                duration: values[hasStationCode ? 8 : 7] || '0',
+                                comments: values[hasStationCode ? 9 : 8] || ''
                             });
+                            
+                            // Track the station code if provided
+                            if (hasStationCode && values[1]) {
+                                usedStationCodes.add(values[1]);
+                            }
                         }
                     });
                     
@@ -2070,7 +2089,7 @@
                         updateDistances();
                         calculateTimes();
                         initializeMap();
-                        table.setData(routeData);
+                        updateTableData();
                         saveRouteData();
                         updateTimeBudget();
                         alert(`Successfully imported ${newRouteData.length} stations from CSV.`);
