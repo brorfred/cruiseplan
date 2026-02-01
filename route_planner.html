@@ -1376,7 +1376,7 @@
             
             // For intermediate stations (not first or last), use number label or ID as the marker
             if (index > 0 && index < routeData.length - 1) {
-                const displayText = markerDisplayMode === 'id' ? (point.stationCode || 'XX') : index;
+                const displayText = markerDisplayMode === 'id' ? (routeData[index].stationCode || 'XX') : index;
                 
                 marker = L.marker([lat, lng], {
                     icon: L.divIcon({
