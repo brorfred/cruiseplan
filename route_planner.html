@@ -768,6 +768,57 @@
             }
         ];
         
+        // Marine organism name lists for station naming
+        const fourLetterNouns = ['Tuna', 'Bass', 'Carp', 'Crab', 'Clam', 'Seal', 'Orca', 'Pike', 'Rudd', 'Tope', 'Hake', 'Sole', 'Ling', 'Chub', 'Dory', 'Goby', 'Newt', 'Frog', 'Toad', 'Duck', 'Swan', 'Loon', 'Coot', 'Gull', 'Tern', 'Ibis', 'Skua', 'Worm', 'Slug', 'Mola', 'Opah', 'Scad', 'Cero', 'Dace', 'Mink'];
+        const fiveLetterNouns = ['Shark', 'Trout', 'Perch', 'Bream', 'Skate', 'Smelt', 'Tench', 'Roach', 'Guppy', 'Molly', 'Tetra', 'Betta', 'Cisco', 'Porgy', 'Wahoo', 'Manta', 'Loach', 'Krill', 'Prawn', 'Shrimp', 'Snail', 'Whelk', 'Conch', 'Squid', 'Whale', 'Otter', 'Heron', 'Egret', 'Grebe', 'Stork', 'Goose', 'Crane', 'Gecko', 'Skink', 'Viper', 'Leech', 'Polyp', 'Coral', 'Hydra', 'Algae'];
+        const fourLetterAdjs = ['Huge', 'Tiny', 'Long', 'Tall', 'Wide', 'Vast', 'Blue', 'Gray', 'Pink', 'Teal', 'Soft', 'Hard', 'Dull', 'Waxy', 'Sick', 'Weak', 'Hale', 'Lame', 'Dead', 'Live', 'Wild', 'Tame', 'Calm', 'Meek', 'Bold', 'Aged', 'Fast', 'Slow', 'Spry', 'Rare', 'Lean'];
+        const fiveLetterAdjs = ['Large', 'Small', 'Giant', 'Gross', 'Stout', 'Lanky', 'Black', 'White', 'Brown', 'Green', 'Fuzzy', 'Hairy', 'Scaly', 'Slimy', 'Shiny', 'Sleek', 'Silky', 'Downy', 'Bushy', 'Leafy', 'Spiny', 'Alive', 'Frail', 'Hardy', 'Plump', 'Gaunt', 'Timid', 'Brave', 'Fierce', 'Agile', 'Young', 'Adult', 'Prime', 'Quick', 'Swift', 'Fleet', 'Nippy', 'Barred', 'Noble', 'Feral', 'Stray', 'Local', 'Alien'];
+        
+        // Track used station names to prevent duplicates
+        const usedStationNames = new Set();
+        
+        // Generate a unique marine organism station name
+        function generateStationName() {
+            const maxAttempts = 1000;
+            let attempts = 0;
+            
+            while (attempts < maxAttempts) {
+                // Randomly choose between two patterns:
+                // Pattern 1: 4-letter adj + 5-letter noun (e.g., "Huge_Shark")
+                // Pattern 2: 5-letter adj + 4-letter noun (e.g., "Large_Tuna")
+                const pattern = Math.random() < 0.5 ? 1 : 2;
+                
+                let name;
+                if (pattern === 1) {
+                    const adj = fourLetterAdjs[Math.floor(Math.random() * fourLetterAdjs.length)];
+                    const noun = fiveLetterNouns[Math.floor(Math.random() * fiveLetterNouns.length)];
+                    name = adj + '_' + noun;
+                } else {
+                    const adj = fiveLetterAdjs[Math.floor(Math.random() * fiveLetterAdjs.length)];
+                    const noun = fourLetterNouns[Math.floor(Math.random() * fourLetterNouns.length)];
+                    name = adj + '_' + noun;
+                }
+                
+                if (!usedStationNames.has(name)) {
+                    usedStationNames.add(name);
+                    return name;
+                }
+                
+                attempts++;
+            }
+            
+            // Fallback if we somehow run out (very unlikely)
+            return 'Station_' + Date.now();
+        }
+        
+        // Rebuild used station names from existing data
+        function rebuildUsedStationNames() {
+            usedStationNames.clear();
+            routeData.forEach(station => {
+                usedStationNames.add(station.stationId);
+            });
+        }
+        
         // Generate unique station ID (2 letters, or 3 if exhausted)
         const usedStationCodes = new Set();
         
@@ -815,6 +866,9 @@
         
         // Initialize station codes from existing data
         initializeStationCodes();
+        
+        // Initialize used station names from existing data
+        rebuildUsedStationNames();
         
         // Ensure all stations have station codes
         routeData.forEach(station => {
@@ -957,7 +1011,7 @@
                     stationId = endName;
                     comments = "Destination";
                 } else {
-                    stationId = `Station-${i + 1}`;
+                    stationId = generateStationName();
                     comments = "";
                 }
                 
@@ -1073,19 +1127,28 @@
                     dataLines.forEach(function(line, index) {
                         const values = parseCSVLine(line);
                         
+                        // Support both old format (9 columns) and new format (10 columns with Station Code)
                         if (values.length >= 9) {
+                            const hasStationCode = values.length >= 10;
+                            
                             newRouteData.push({
                                 id: index + 1,
-                                stationId: values[0] || `Station-${index + 1}`,
-                                lat: parseFloat(values[1]) || 0,
-                                lng: parseFloat(values[2]) || 0,
-                                distance: parseFloat(values[3]) || 0,
-                                speed: values[4] || '8',
-                                arrival: values[5] || '',
-                                departure: values[6] || '',
-                                duration: values[7] || '0',
-                                comments: values[8] || ''
+                                stationId: values[0] || generateStationName(),
+                                stationCode: hasStationCode && values[1] ? values[1] : generateStationCode(),
+                                lat: parseFloat(values[hasStationCode ? 2 : 1]) || 0,
+                                lng: parseFloat(values[hasStationCode ? 3 : 2]) || 0,
+                                distance: parseFloat(values[hasStationCode ? 4 : 3]) || 0,
+                                speed: values[hasStationCode ? 5 : 4] || '8',
+                                arrival: values[hasStationCode ? 6 : 5] || '',
+                                departure: values[hasStationCode ? 7 : 6] || '',
+                                duration: values[hasStationCode ? 8 : 7] || '0',
+                                comments: values[hasStationCode ? 9 : 8] || ''
                             });
+                            
+                            // Track the station code if provided
+                            if (hasStationCode && values[1]) {
+                                usedStationCodes.add(values[1]);
+                            }
                         }
                     });
                     
@@ -1459,7 +1522,7 @@
                     // Insert new point
                     const newPoint = {
                         id: insertIndex + 1,
-                        stationId: `Station-${insertIndex + 1}`,
+                        stationId: generateStationName(),
                         stationCode: generateStationCode(),
                         lat: parseFloat(clickedLatLng.lat.toFixed(6)),
                         lng: parseFloat(clickedLatLng.lng.toFixed(6)),
@@ -1926,7 +1989,7 @@
                                 
                                 newRouteData.push({
                                     id: index + 1,
-                                    stationId: props.stationId || props.name || `Station-${index + 1}`,
+                                    stationId: props.stationId || props.name || generateStationName(),
                                     stationCode: stationCode,
                                     lat: coords[1], // GeoJSON uses [lng, lat]
                                     lng: coords[0],
@@ -2062,7 +2125,7 @@
                             
                             newRouteData.push({
                                 id: index + 1,
-                                stationId: values[0] || `Station-${index + 1}`,
+                                stationId: values[0] || generateStationName(),
                                 stationCode: hasStationCode && values[1] ? values[1] : generateStationCode(),
                                 lat: parseFloat(values[hasStationCode ? 2 : 1]) || 0,
                                 lng: parseFloat(values[hasStationCode ? 3 : 2]) || 0,
