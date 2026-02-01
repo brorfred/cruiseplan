@@ -416,18 +416,22 @@
         .tabulator-footer {
             background: #2c5aa0 !important;
             border-top: 2px solid #1e3a6b !important;
-            padding: 10px 15px;
+            padding: 6px 15px !important;
             color: white !important;
         }
         
         .tabulator-footer .tabulator-page-counter {
-            color: white;
+            color: white !important;
             font-weight: 500;
         }
         
         .tabulator-footer .tabulator-page-size {
-            color: white;
+            color: white !important;
             margin-right: 10px;
+        }
+        
+        .tabulator-footer .tabulator-page-size label {
+            color: white !important;
         }
         
         .tabulator-footer select {
@@ -435,8 +439,9 @@
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 4px;
-            padding: 4px 8px;
+            padding: 2px 6px;
             font-weight: 500;
+            font-size: 12px;
         }
         
         .tabulator-page {
@@ -446,6 +451,8 @@
             font-weight: 500;
             margin: 0 2px;
             border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
         }
         
         .tabulator-page.active {
@@ -1645,8 +1652,8 @@
             height: "100%",
             layout: "fitColumns",
             pagination: true,
-            paginationSize: 10,
-            paginationSizeSelector: [5, 10, 20, 50, 100],
+            paginationSize: 20,
+            paginationSizeSelector: [10, 20, 50, 100],
             paginationCounter: "rows",
             rowFormatter: function(row) {
                 const data = row.getData();
