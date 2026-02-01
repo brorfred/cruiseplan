@@ -1514,6 +1514,34 @@
             }, 0);
         }
         
+        // Update specific cells without re-rendering entire table
+        function updateCellValues(startIndex) {
+            // Update all rows from startIndex forward with new calculated values
+            for (let i = startIndex; i < routeData.length; i++) {
+                const rowData = routeData[i];
+                
+                // Find all inputs for this row and update their values
+                const rowElement = document.querySelector(`[data-row-index="${i}"]`)?.closest('.custom-row-container');
+                if (rowElement) {
+                    // Update arrival input
+                    const arrivalInput = rowElement.querySelector(`input[data-field="arrival"][data-row-index="${i}"]`);
+                    if (arrivalInput && arrivalInput._flatpickr) {
+                        arrivalInput._flatpickr.setDate(rowData.arrival, false);
+                    } else if (arrivalInput) {
+                        arrivalInput.value = rowData.arrival || '';
+                    }
+                    
+                    // Update departure input
+                    const departureInput = rowElement.querySelector(`input[data-field="departure"][data-row-index="${i}"]`);
+                    if (departureInput && departureInput._flatpickr) {
+                        departureInput._flatpickr.setDate(rowData.departure, false);
+                    } else if (departureInput) {
+                        departureInput.value = rowData.departure || '';
+                    }
+                }
+            }
+        }
+        
         // Update polyline
         function updatePolyline() {
             if (polyline) {
@@ -1632,7 +1660,7 @@
             } else if (field === "departure") {
                 // When departure is manually edited, recalculate from this point forward
                 calculateTimesFromIndex(index);
-                updateTableData();
+                updateCellValues(index + 1); // Update subsequent rows
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "arrival") {
@@ -1645,7 +1673,7 @@
                         routeData[index].departure = formatDateTime(departureDate);
                     }
                     calculateTimesFromIndex(index);
-                    updateTableData();
+                    updateCellValues(index); // Update this row and subsequent rows
                     saveRouteData();
                     updateTimeBudget();
                 }
