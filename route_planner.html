@@ -412,6 +412,27 @@
             font-size: 13px;
         }
         
+        /* Close button for flatpickr */
+        .flatpickr-close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background 0.2s;
+        }
+        
+        .flatpickr-close-button:hover {
+            background: #c82333;
+        }
+        
         /* Tabulator pagination styling */
         .tabulator-footer {
             background: #2c5aa0 !important;
@@ -493,9 +514,60 @@
             font-weight: 500;
         }
         
+        /* Manually set datetime fields - bold green text */
+        .custom-cell input[type="text"].flatpickr-input.manually-set {
+            background: transparent;
+            color: #155724; /* Dark green text */
+            font-weight: 700; /* Bold */
+        }
+        
         .custom-cell input[type="text"].flatpickr-input:focus {
             outline: none;
             background: rgba(65, 105, 225, 0.05);
+        }
+        
+        .custom-cell input[type="text"].flatpickr-input.manually-set:focus {
+            outline: none;
+            background: transparent;
+        }
+        
+        /* Container for datetime input with unselect button */
+        .datetime-input-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+        
+        .datetime-input-container input {
+            flex: 1;
+        }
+        
+        .unselect-btn {
+            background: none;
+            border: none;
+            color: #155724;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .unselect-btn:hover {
+            background: rgba(21, 87, 36, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .unselect-btn:active {
+            transform: scale(0.95);
         }
         
         /* All other editable inputs in table - same styling */
@@ -517,14 +589,26 @@
     <div id="setup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto;">
         <div style="background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 20px auto; max-height: 90vh; overflow-y: auto;">
             <h2 style="margin-top: 0; color: #2c5aa0;">Route Setup</h2>
-            <p style="color: #6c757d; margin-bottom: 20px;">Create a new route or import from CSV:</p>
+            <p style="color: #6c757d; margin-bottom: 20px;">Create a new route or import from file:</p>
             
-            <!-- CSV Upload Option -->
+            <!-- File Upload Options -->
             <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 4px; border: 2px dashed #2c5aa0;">
-                <h3 style="font-size: 14px; color: #2c5aa0; margin-top: 0; margin-bottom: 10px;">Option 1: Import from CSV</h3>
-                <p style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">Upload a previously exported route file</p>
-                <input type="file" id="setup-csv-input" accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
-                <button id="setup-csv-upload" style="width: 100%; margin-top: 10px; padding: 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;">Upload CSV</button>
+                <h3 style="font-size: 14px; color: #2c5aa0; margin-top: 0; margin-bottom: 10px;">Option 1: Import from File</h3>
+                <p style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">Upload a previously exported route file (CSV or GeoJSON)</p>
+                
+                <!-- CSV Upload -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: #28a745;">CSV File:</label>
+                    <input type="file" id="setup-csv-input" accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                    <button id="setup-csv-upload" style="width: 100%; margin-top: 8px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;">Upload CSV</button>
+                </div>
+                
+                <!-- GeoJSON Upload -->
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: #6f42c1;">GeoJSON File:</label>
+                    <input type="file" id="setup-geojson-input" accept=".json,.geojson" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                    <button id="setup-geojson-upload" style="width: 100%; margin-top: 8px; padding: 10px; background: #6f42c1; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;">Upload GeoJSON</button>
+                </div>
             </div>
             
             <div style="text-align: center; margin: 20px 0; color: #adb5bd; font-weight: 600;">OR</div>
@@ -670,7 +754,18 @@
             dateFormat: "Y-m-d H:i",
             time_24hr: true,
             minuteIncrement: 1,
-            allowInput: true
+            allowInput: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                // Add close button to calendar
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = 'Close';
+                closeBtn.className = 'flatpickr-close-button';
+                closeBtn.type = 'button';
+                closeBtn.addEventListener('click', function() {
+                    instance.close();
+                });
+                instance.calendarContainer.appendChild(closeBtn);
+            }
         };
         
         // Setup modal pickers
@@ -943,9 +1038,9 @@
                 // Get previous state
                 routeData = history.pop();
                 
-                // Update everything
+                // Update everything except times (already in the saved state)
                 updateDistances();
-                calculateTimes();
+                // Do NOT call calculateTimes() - times are already in the restored state
                 initializeMap();
                 table.setData(routeData);
                 saveRouteData();
@@ -1206,6 +1301,77 @@
             reader.readAsText(file);
         });
         
+        // Setup GeoJSON Upload Handler
+        document.getElementById('setup-geojson-upload').addEventListener('click', function() {
+            const fileInput = document.getElementById('setup-geojson-input');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a GeoJSON file first.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const geojson = JSON.parse(e.target.result);
+                    
+                    if (!geojson.features || !Array.isArray(geojson.features)) {
+                        alert('Invalid GeoJSON format. Must contain a "features" array.');
+                        return;
+                    }
+                    
+                    const newRouteData = [];
+                    
+                    geojson.features.forEach(function(feature, index) {
+                        if (feature.geometry && feature.geometry.type === 'Point') {
+                            const coords = feature.geometry.coordinates;
+                            const props = feature.properties || {};
+                            
+                            // Extract station name from properties (name or stationId)
+                            const stationName = props.name || props.stationId || generateStationName();
+                            const stationCode = props.stationCode || generateStationCode();
+                            
+                            newRouteData.push({
+                                id: index + 1,
+                                stationId: stationName,
+                                stationCode: stationCode,
+                                lat: coords[1], // GeoJSON uses [lng, lat]
+                                lng: coords[0],
+                                distance: parseFloat(props.distance) || 0,
+                                speed: props.speed || '8',
+                                arrival: props.arrive || props.arrival || '',
+                                departure: props.departure || '',
+                                duration: props.duration || '0',
+                                comments: props.comments || ''
+                            });
+                            
+                            // Track the station code
+                            usedStationCodes.add(stationCode);
+                        }
+                    });
+                    
+                    if (newRouteData.length > 0) {
+                        routeData = newRouteData;
+                        updateDistances();
+                        calculateTimes();
+                        ensureDefaultSpeed();
+                        initializeMap();
+                        table.setData(routeData);
+                        saveRouteData();
+                        hideSetupModal();
+                    } else {
+                        alert('No valid Point features found in GeoJSON file.');
+                    }
+                } catch (error) {
+                    alert('Error parsing GeoJSON file: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        });
+        
         // Ensure all stations have a speed value (use default 8 if missing or empty)
         function ensureDefaultSpeed() {
             const defaultSpeed = document.getElementById('normal-speed').value || '8';
@@ -1335,11 +1501,15 @@
                             // Calculate arrival time (add travel time in hours)
                             const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
                             point.arrival = formatDateTime(arrivalDate);
+                            // Clear manual flag since this is calculated
+                            point.arrival_manual = false;
                             
                             // Calculate departure time based on duration
                             const duration = parseFloat(point.duration) || 0;
                             const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
                             point.departure = formatDateTime(departureDate);
+                            // Clear manual flag since this is calculated
+                            point.departure_manual = false;
                         }
                     }
                 }
@@ -1366,6 +1536,31 @@
             const minutes = String(date.getMinutes()).padStart(2, '0');
             
             return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+        
+        // Clear manual datetime setting and recalculate
+        function clearManualDateTime(rowIndex, field) {
+            saveToHistory();
+            
+            // Clear the manual flag
+            routeData[rowIndex][field + '_manual'] = false;
+            
+            // Recalculate times from this index
+            if (field === 'departure') {
+                calculateTimesFromIndex(rowIndex);
+            } else if (field === 'arrival') {
+                // For arrival, recalculate from next station if it's the first station
+                if (rowIndex === 0) {
+                    calculateTimesFromIndex(rowIndex + 1);
+                } else {
+                    calculateTimesFromIndex(rowIndex);
+                }
+            }
+            
+            // Update the table display
+            updateTableData();
+            saveRouteData();
+            updateTimeBudget();
         }
         
         // Create draggable marker
@@ -1526,18 +1721,36 @@
                 if (rowElement) {
                     // Update arrival input
                     const arrivalInput = rowElement.querySelector(`input[data-field="arrival"][data-row-index="${i}"]`);
-                    if (arrivalInput && arrivalInput._flatpickr) {
-                        arrivalInput._flatpickr.setDate(rowData.arrival, false);
-                    } else if (arrivalInput) {
-                        arrivalInput.value = rowData.arrival || '';
+                    if (arrivalInput) {
+                        // Update the manually-set class based on routeData flag
+                        if (rowData.arrival_manual) {
+                            arrivalInput.classList.add('manually-set');
+                        } else {
+                            arrivalInput.classList.remove('manually-set');
+                        }
+                        
+                        if (arrivalInput._flatpickr) {
+                            arrivalInput._flatpickr.setDate(rowData.arrival, false);
+                        } else {
+                            arrivalInput.value = rowData.arrival || '';
+                        }
                     }
                     
                     // Update departure input
                     const departureInput = rowElement.querySelector(`input[data-field="departure"][data-row-index="${i}"]`);
-                    if (departureInput && departureInput._flatpickr) {
-                        departureInput._flatpickr.setDate(rowData.departure, false);
-                    } else if (departureInput) {
-                        departureInput.value = rowData.departure || '';
+                    if (departureInput) {
+                        // Update the manually-set class based on routeData flag
+                        if (rowData.departure_manual) {
+                            departureInput.classList.add('manually-set');
+                        } else {
+                            departureInput.classList.remove('manually-set');
+                        }
+                        
+                        if (departureInput._flatpickr) {
+                            departureInput._flatpickr.setDate(rowData.departure, false);
+                        } else {
+                            departureInput.value = rowData.departure || '';
+                        }
                     }
                 }
             }
@@ -1653,28 +1866,163 @@
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "speed" || field === "duration") {
-                // Recalculate times when speed or duration changes
-                calculateTimes();
-                updateTableData();
+                // When speed or duration changes, we need to recalculate times intelligently:
+                // - Find the last manual time BEFORE or AT this index
+                // - Find the next manual time AFTER this index
+                // - Only recalculate the stations between these two anchors
+                
+                let recalcStartIndex = 0;
+                let recalcEndIndex = routeData.length;
+                
+                // Find the last manual time at or before this index
+                for (let i = index; i >= 0; i--) {
+                    if (routeData[i].arrival_manual || routeData[i].departure_manual) {
+                        recalcStartIndex = i + 1; // Start recalculating AFTER this manual time
+                        break;
+                    }
+                }
+                
+                // Find the next manual time after this index
+                for (let i = index + 1; i < routeData.length; i++) {
+                    if (routeData[i].arrival_manual || routeData[i].departure_manual) {
+                        recalcEndIndex = i; // Stop recalculating BEFORE this manual time
+                        break;
+                    }
+                }
+                
+                // Recalculate only the affected range
+                if (recalcStartIndex < recalcEndIndex) {
+                    // Use a modified version that only recalculates up to recalcEndIndex
+                    for (let i = recalcStartIndex; i < recalcEndIndex; i++) {
+                        const point = routeData[i];
+                        
+                        if (i === 0) {
+                            point.arrival = "";
+                        } else {
+                            const prev = routeData[i - 1];
+                            const segmentDistance = point.distance - prev.distance;
+                            let speed = parseFloat(point.speed);
+                            if (!speed || speed <= 0) {
+                                speed = parseFloat(prev.speed);
+                            }
+                            
+                            if (speed && speed > 0 && prev.departure) {
+                                const travelTimeHours = segmentDistance / speed;
+                                const prevDeparture = parseDateTime(prev.departure);
+                                if (prevDeparture !== null) {
+                                    const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                                    point.arrival = formatDateTime(arrivalDate);
+                                    point.arrival_manual = false;
+                                    
+                                    const duration = parseFloat(point.duration) || 0;
+                                    const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                    point.departure = formatDateTime(departureDate);
+                                    point.departure_manual = false;
+                                }
+                            }
+                        }
+                    }
+                    updateCellValues(recalcStartIndex);
+                } else {
+                    // No recalculation needed or entire route
+                    calculateTimes();
+                    updateTableData();
+                }
+                
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "departure") {
-                // When departure is manually edited, recalculate from this point forward
-                calculateTimesFromIndex(index);
-                updateCellValues(index + 1); // Update subsequent rows
+                // When departure is manually edited, recalculate only up to next manual time
+                const recalcStartIndex = index + 1;
+                let recalcEndIndex = routeData.length;
+                
+                // Find next manual time after this index
+                for (let i = recalcStartIndex; i < routeData.length; i++) {
+                    if (routeData[i].arrival_manual || routeData[i].departure_manual) {
+                        recalcEndIndex = i;
+                        break;
+                    }
+                }
+                
+                // Recalculate only between this departure and next manual time
+                for (let i = recalcStartIndex; i < recalcEndIndex; i++) {
+                    const point = routeData[i];
+                    const prev = routeData[i - 1];
+                    const segmentDistance = point.distance - prev.distance;
+                    let speed = parseFloat(point.speed);
+                    if (!speed || speed <= 0) {
+                        speed = parseFloat(prev.speed);
+                    }
+                    
+                    if (speed && speed > 0 && prev.departure) {
+                        const travelTimeHours = segmentDistance / speed;
+                        const prevDeparture = parseDateTime(prev.departure);
+                        if (prevDeparture !== null) {
+                            const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                            point.arrival = formatDateTime(arrivalDate);
+                            point.arrival_manual = false;
+                            
+                            const duration = parseFloat(point.duration) || 0;
+                            const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                            point.departure = formatDateTime(departureDate);
+                            point.departure_manual = false;
+                        }
+                    }
+                }
+                
+                updateCellValues(recalcStartIndex);
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "arrival") {
-                // When arrival is manually edited, update departure based on duration, then recalculate forward
+                // When arrival is manually edited, update departure based on duration
                 if (index > 0) {
                     const duration = parseFloat(routeData[index].duration) || 0;
                     const arrivalDate = parseDateTime(routeData[index].arrival);
                     if (arrivalDate) {
                         const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
                         routeData[index].departure = formatDateTime(departureDate);
+                        // Mark departure as calculated (derived from manual arrival)
+                        routeData[index].departure_manual = false;
                     }
-                    // Recalculate times AFTER this station (not including it)
-                    calculateTimesFromIndex(index + 1);
+                    
+                    // Recalculate only up to next manual time
+                    const recalcStartIndex = index + 1;
+                    let recalcEndIndex = routeData.length;
+                    
+                    // Find next manual time after this index
+                    for (let i = recalcStartIndex; i < routeData.length; i++) {
+                        if (routeData[i].arrival_manual || routeData[i].departure_manual) {
+                            recalcEndIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // Recalculate only between this arrival and next manual time
+                    for (let i = recalcStartIndex; i < recalcEndIndex; i++) {
+                        const point = routeData[i];
+                        const prev = routeData[i - 1];
+                        const segmentDistance = point.distance - prev.distance;
+                        let speed = parseFloat(point.speed);
+                        if (!speed || speed <= 0) {
+                            speed = parseFloat(prev.speed);
+                        }
+                        
+                        if (speed && speed > 0 && prev.departure) {
+                            const travelTimeHours = segmentDistance / speed;
+                            const prevDeparture = parseDateTime(prev.departure);
+                            if (prevDeparture !== null) {
+                                const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                                point.arrival = formatDateTime(arrivalDate);
+                                point.arrival_manual = false;
+                                
+                                const duration = parseFloat(point.duration) || 0;
+                                const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                point.departure = formatDateTime(departureDate);
+                                point.departure_manual = false;
+                            }
+                        }
+                    }
+                    
                     updateCellValues(index); // Update this row's departure and subsequent rows
                     saveRouteData();
                     updateTimeBudget();
@@ -1691,7 +2039,8 @@
         
         // Initialize everything
         updateDistances();
-        calculateTimes();
+        // Do NOT call calculateTimes() here - it would overwrite manual time flags loaded from storage
+        // Times are already in the loaded data
         ensureDefaultSpeed(); // Make sure all speeds are populated
         updateUndoButton(); // Initialize undo button state
         
@@ -1811,6 +2160,12 @@
                             input.dataset.field = col.field;
                             input.dataset.rowIndex = rowIndex;
                             
+                            // Check if this datetime was manually set (stored in routeData)
+                            const isManuallySet = routeData[rowIndex][col.field + '_manual'];
+                            if (isManuallySet) {
+                                input.classList.add('manually-set');
+                            }
+                            
                             // Initialize flatpickr and store instance on input
                             input._flatpickr = flatpickr(input, {
                                 enableTime: true,
@@ -1818,17 +2173,52 @@
                                 time_24hr: true,
                                 minuteIncrement: 1,
                                 allowInput: true,
+                                onReady: function(selectedDates, dateStr, instance) {
+                                    // Add close button to calendar
+                                    const closeBtn = document.createElement('button');
+                                    closeBtn.innerHTML = 'Close';
+                                    closeBtn.className = 'flatpickr-close-button';
+                                    closeBtn.type = 'button';
+                                    closeBtn.addEventListener('click', function() {
+                                        instance.close();
+                                    });
+                                    instance.calendarContainer.appendChild(closeBtn);
+                                },
                                 onClose: function(selectedDates, dateStr, instance) {
                                     if (dateStr) {
                                         saveToHistory();
                                         routeData[rowIndex][col.field] = dateStr;
+                                        // Mark as manually set
+                                        routeData[rowIndex][col.field + '_manual'] = true;
+                                        input.classList.add('manually-set');
                                         input.value = dateStr;
                                         handleFieldUpdate(col.field, rowIndex);
                                     }
                                 }
                             });
                             
-                            cell.appendChild(input);
+                            // Create container and add unselect button if manually set
+                            if (isManuallySet) {
+                                const container = document.createElement('div');
+                                container.className = 'datetime-input-container';
+                                
+                                const unselectBtn = document.createElement('button');
+                                unselectBtn.className = 'unselect-btn';
+                                unselectBtn.innerHTML = '✕';
+                                unselectBtn.type = 'button';
+                                unselectBtn.title = 'Clear manual setting';
+                                unselectBtn.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    clearManualDateTime(rowIndex, col.field);
+                                });
+                                
+                                container.appendChild(input);
+                                container.appendChild(unselectBtn);
+                                cell.appendChild(container);
+                            } else {
+                                cell.appendChild(input);
+                            }
                         } else {
                             const input = document.createElement('input');
                             input.type = 'text';

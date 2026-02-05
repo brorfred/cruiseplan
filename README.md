@@ -2,7 +2,7 @@
 
 A professional web-based route planning application for oceanographic cruises with modern UI, interactive mapping, and comprehensive data management.
 
-![Version](https://img.shields.io/badge/version-2.1-blue)
+![Version](https://img.shields.io/badge/version-2.2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 🌊 Overview
@@ -55,6 +55,7 @@ The Ship Route Planner is a standalone HTML application designed for oceanograph
 - **Automatic distance calculations** using Haversine formula
 - **Automatic time calculations** based on speed and distance
 - **Smart recalculation** - manual time entries preserved, only subsequent stations recalculated
+- **Manual time management** - bold green text for manually set times with quick unselect button (✕) to revert to calculated values
 
 ### ⏱️ Time Budget Tracking
 - **Cruise start/end dates** with deadline tracking
@@ -228,7 +229,14 @@ Fast_Whale,XY,42.456789,-70.654321,25.5,8,2024-01-15 13:12,2024-01-15 15:00,1.8,
 
 ## 📖 Version History
 
-### v2.1 (Current) - UI Polish & Fixes
+### v2.2 (Current) - Manual Time Management
+- **Bold green text** for manually set arrival/departure times
+- **Unselect button (✕)** next to manually set times for quick revert
+- Click unselect button to clear manual setting and recalculate downstream times
+- Improved visual distinction between manual and calculated times
+- Complete history tracking for manual time changes
+
+### v2.1 - UI Polish & Fixes
 - ID/# toggle switch for marker display
 - Borderless table columns
 - Compact pagination footer (white text)
@@ -238,8 +246,6 @@ Fast_Whale,XY,42.456789,-70.654321,25.5,8,2024-01-15 13:12,2024-01-15 15:00,1.8,
 - Station column width increased to 130px
 - Default page size: 20 rows
 - Removed debug logging
-
-### v2.0 - Enhanced UI
 - Marine organism station naming system
 - Modern pill-style buttons with split pills
 - Flatpickr datetime pickers
@@ -321,4 +327,4 @@ For issues or questions:
 
 ---
 
-**Version 2.1** | Built for oceanographic research | No installation required | Works offline after first load
+**Version 2.2** | Built for oceanographic research | No installation required | Works offline after first load
