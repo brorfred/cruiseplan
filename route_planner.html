@@ -1538,24 +1538,81 @@
             return `${year}-${month}-${day} ${hours}:${minutes}`;
         }
         
-        // Clear manual datetime setting and recalculate
+        // Rebuild datetime cell to add unselect button
+        function rebuildDateTimeCell(cell, input, rowIndex, field) {
+            // Check if button already exists
+            const existingContainer = cell.querySelector('.datetime-input-container');
+            if (existingContainer) {
+                return; // Already has button
+            }
+            
+            // Clear the cell
+            cell.innerHTML = '';
+            
+            // Create container
+            const container = document.createElement('div');
+            container.className = 'datetime-input-container';
+            
+            // Move the input to the container
+            container.appendChild(input);
+            
+            // Create unselect button
+            const unselectBtn = document.createElement('button');
+            unselectBtn.className = 'unselect-btn';
+            unselectBtn.innerHTML = '✕';
+            unselectBtn.type = 'button';
+            unselectBtn.title = 'Clear manual setting';
+            unselectBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                clearManualDateTime(rowIndex, field);
+            });
+            
+            container.appendChild(unselectBtn);
+            cell.appendChild(container);
+        }
+        
+        // Clear manual datetime setting and recalculate only the next station
         function clearManualDateTime(rowIndex, field) {
             saveToHistory();
             
             // Clear the manual flag
             routeData[rowIndex][field + '_manual'] = false;
             
-            // Recalculate times from this index
+            // Only recalculate the next station's arrival (not all downstream)
             if (field === 'departure') {
-                calculateTimesFromIndex(rowIndex);
-            } else if (field === 'arrival') {
-                // For arrival, recalculate from next station if it's the first station
-                if (rowIndex === 0) {
-                    calculateTimesFromIndex(rowIndex + 1);
-                } else {
-                    calculateTimesFromIndex(rowIndex);
+                const nextIndex = rowIndex + 1;
+                if (nextIndex < routeData.length) {
+                    const current = routeData[rowIndex];
+                    const next = routeData[nextIndex];
+                    
+                    if (current.departure) {
+                        const segmentDistance = next.distance - current.distance;
+                        let speed = parseFloat(next.speed);
+                        if (!speed || speed <= 0) {
+                            speed = parseFloat(current.speed);
+                        }
+                        
+                        if (speed && speed > 0) {
+                            const travelTimeHours = segmentDistance / speed;
+                            const prevDeparture = parseDateTime(current.departure);
+                            if (prevDeparture !== null) {
+                                const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                                next.arrival = formatDateTime(arrivalDate);
+                                next.arrival_manual = false;
+                                
+                                // Recalculate next station's departure only if not manually set
+                                if (!next.departure_manual) {
+                                    const duration = parseFloat(next.duration) || 0;
+                                    const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                    next.departure = formatDateTime(departureDate);
+                                }
+                            }
+                        }
+                    }
                 }
             }
+            // For arrival, no recalculation needed (calculated from previous departure)
             
             // Update the table display
             updateTableData();
@@ -2192,6 +2249,10 @@
                                         routeData[rowIndex][col.field + '_manual'] = true;
                                         input.classList.add('manually-set');
                                         input.value = dateStr;
+                                        
+                                        // Immediately rebuild the cell to add the unselect button
+                                        rebuildDateTimeCell(cell, input, rowIndex, col.field);
+                                        
                                         handleFieldUpdate(col.field, rowIndex);
                                     }
                                 }
