@@ -2250,6 +2250,19 @@
                                         input.classList.add('manually-set');
                                         input.value = dateStr;
                                         
+                                        // Calculate duration if departure time is being set
+                                        if (col.field === 'departure' && routeData[rowIndex].arrival) {
+                                            const arrivalTime = parseDateTime(routeData[rowIndex].arrival);
+                                            const departureTime = parseDateTime(dateStr);
+                                            if (arrivalTime !== null && departureTime !== null) {
+                                                // Calculate duration in hours
+                                                const durationMs = departureTime.getTime() - arrivalTime.getTime();
+                                                const durationHours = durationMs / (1000 * 60 * 60);
+                                                // Round to 2 decimal places
+                                                routeData[rowIndex].duration = Math.round(durationHours * 100) / 100;
+                                            }
+                                        }
+                                        
                                         // Immediately rebuild the cell to add the unselect button
                                         rebuildDateTimeCell(cell, input, rowIndex, col.field);
                                         
