@@ -6,6 +6,7 @@
     <title>Route Planner</title>
     
     <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- Tabulator CSS -->
@@ -110,59 +111,114 @@
         
         #button-panel {
             padding: 12px 15px;
-            background: linear-gradient(to top, #f8f9fa, #e9ecef);
-            border-top: 1px solid #dee2e6;
+            background: #2c5aa0;
+            border-top: none;
             display: flex;
-            gap: 8px;
-            justify-content: center;
+            gap: 10px;
+            justify-content: flex-start;
+            align-items: center;
         }
         
         #button-panel button {
-            padding: 6px 15px;
+            padding: 9px 20px;
             color: white;
-            border: none;
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Light border */
+            border-radius: 25px; /* Pill shape */
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Lighter shadow */
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #button-panel button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: left 0.3s ease;
+        }
+        
+        #button-panel button:hover:before {
+            left: 100%;
         }
         
         #button-panel button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
         }
         
-        #button-panel button#download-csv:hover {
-            background: #218838;
+        #button-panel button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
         }
         
-        #button-panel button#undo-btn:hover {
-            background: #5a6268;
+        #button-panel button#undo-btn {
+            background: linear-gradient(to bottom, #8a8f98, #6c757d);
+        }
+        
+        #button-panel button#download-csv {
+            background: linear-gradient(to bottom, #34ce57, #28a745);
+        }
+        
+        #button-panel button#download-geojson {
+            background: linear-gradient(to bottom, #8b5cf6, #6f42c1);
+        }
+        
+        #button-panel button#upload-csv {
+            background: linear-gradient(to bottom, #3db8d4, #17a2b8);
+        }
+        
+        #button-panel button#reset-data {
+            background: linear-gradient(to bottom, #f56565, #dc3545);
         }
         
         #button-panel button#undo-btn:disabled {
-            background: #9ca3af;
+            background: linear-gradient(to bottom, #c4c8cf, #9ca3af);
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
-        #button-panel button#download-geojson:hover {
-            background: #5a32a3;
+        #button-panel button#undo-btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
-        #button-panel button#upload-csv:hover {
-            background: #138496;
+        #button-panel button#undo-btn:disabled:before {
+            display: none;
         }
         
-        #button-panel button#reset-data:hover {
-            background: #c82333;
+        /* Split pill button hover effects */
+        .split-pill button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .split-pill button:active {
+            background: rgba(0, 0, 0, 0.1);
         }
         
         /* Tabulator customization for compact look */
         .tabulator {
             font-size: 12px;
             border: none;
+            background: white;
+        }
+        
+        .tabulator-tableholder {
+            background: white;
         }
         
         .tabulator-header {
@@ -172,7 +228,7 @@
         
         .tabulator-col {
             background: #2c5aa0 !important;
-            border-right: 1px solid #3d6bb5;
+            border-right: none !important;
         }
         
         .tabulator-col-content {
@@ -219,7 +275,7 @@
         
         .tabulator-cell {
             padding: 6px 8px;
-            border-right: 1px solid #e9ecef;
+            border-right: none !important;
         }
         
         .tabulator-cell input {
@@ -334,21 +390,225 @@
             font-family: monospace;
             color: #333;
         }
+        
+        /* Flatpickr customization for nautical theme */
+        .flatpickr-calendar {
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .flatpickr-day.selected, 
+        .flatpickr-day.selected:hover {
+            background: #2c5aa0;
+            border-color: #2c5aa0;
+        }
+        
+        .flatpickr-time input:hover,
+        .flatpickr-time input:focus {
+            background: #e7f3ff;
+        }
+        
+        .flatpickr-calendar.inline {
+            font-size: 13px;
+        }
+        
+        /* Close button for flatpickr */
+        .flatpickr-close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background 0.2s;
+        }
+        
+        .flatpickr-close-button:hover {
+            background: #c82333;
+        }
+        
+        /* Tabulator pagination styling */
+        .tabulator-footer {
+            background: #2c5aa0 !important;
+            border-top: 2px solid #1e3a6b !important;
+            border-bottom: none !important;
+            padding: 6px 15px !important;
+            color: white !important;
+        }
+        
+        .tabulator-footer * {
+            color: white !important;
+        }
+        
+        .tabulator-footer .tabulator-page-counter {
+            color: white !important;
+            font-weight: 500;
+        }
+        
+        .tabulator-footer .tabulator-page-size {
+            color: white !important;
+            margin-right: 10px;
+        }
+        
+        .tabulator-footer .tabulator-page-size label {
+            color: white !important;
+        }
+        
+        .tabulator-footer .tabulator-paginator {
+            color: white !important;
+        }
+        
+        .tabulator-footer select {
+            background: #1e3a6b !important;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        
+        .tabulator-footer select option {
+            background: #1e3a6b;
+            color: white;
+        }
+        
+        .tabulator-page {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            font-weight: 500;
+            margin: 0 2px;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+        
+        .tabulator-page.active {
+            background: #1e3a6b !important;
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        .tabulator-page:not(.disabled):hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        .tabulator-page.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        /* Flatpickr datetime inputs in table - custom styling */
+        .custom-cell input[type="text"].flatpickr-input {
+            border: none;
+            background: transparent;
+            color: #4169e1; /* Royal blue */
+            font-weight: 500;
+        }
+        
+        /* Manually set datetime fields - bold green text */
+        .custom-cell input[type="text"].flatpickr-input.manually-set {
+            background: transparent;
+            color: #155724; /* Dark green text */
+            font-weight: 700; /* Bold */
+        }
+        
+        .custom-cell input[type="text"].flatpickr-input:focus {
+            outline: none;
+            background: rgba(65, 105, 225, 0.05);
+        }
+        
+        .custom-cell input[type="text"].flatpickr-input.manually-set:focus {
+            outline: none;
+            background: transparent;
+        }
+        
+        /* Container for datetime input with unselect button */
+        .datetime-input-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+        
+        .datetime-input-container input {
+            flex: 1;
+        }
+        
+        .unselect-btn {
+            background: none;
+            border: none;
+            color: #155724;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .unselect-btn:hover {
+            background: rgba(21, 87, 36, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .unselect-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* All other editable inputs in table - same styling */
+        .custom-cell input[type="text"]:not(.flatpickr-input) {
+            border: none;
+            background: transparent;
+            color: #4169e1; /* Royal blue */
+            font-weight: 500;
+        }
+        
+        .custom-cell input[type="text"]:not(.flatpickr-input):focus {
+            outline: none;
+            background: rgba(65, 105, 225, 0.05);
+        }
     </style>
 </head>
 <body>
     <!-- Initial Setup Modal -->
-    <div id="setup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+    <div id="setup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 20px auto; max-height: 90vh; overflow-y: auto;">
             <h2 style="margin-top: 0; color: #2c5aa0;">Route Setup</h2>
-            <p style="color: #6c757d; margin-bottom: 20px;">Create a new route or import from CSV:</p>
+            <p style="color: #6c757d; margin-bottom: 20px;">Create a new route or import from file:</p>
             
-            <!-- CSV Upload Option -->
+            <!-- File Upload Options -->
             <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 4px; border: 2px dashed #2c5aa0;">
-                <h3 style="font-size: 14px; color: #2c5aa0; margin-top: 0; margin-bottom: 10px;">Option 1: Import from CSV</h3>
-                <p style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">Upload a previously exported route file</p>
-                <input type="file" id="setup-csv-input" accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
-                <button id="setup-csv-upload" style="width: 100%; margin-top: 10px; padding: 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;">Upload CSV</button>
+                <h3 style="font-size: 14px; color: #2c5aa0; margin-top: 0; margin-bottom: 10px;">Option 1: Import from File</h3>
+                <p style="font-size: 12px; color: #6c757d; margin-bottom: 10px;">Upload a previously exported route file (CSV or GeoJSON)</p>
+                
+                <!-- CSV Upload -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: #28a745;">CSV File:</label>
+                    <input type="file" id="setup-csv-input" accept=".csv" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                    <button id="setup-csv-upload" style="width: 100%; margin-top: 8px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;">Upload CSV</button>
+                </div>
+                
+                <!-- GeoJSON Upload -->
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: #6f42c1;">GeoJSON File:</label>
+                    <input type="file" id="setup-geojson-input" accept=".json,.geojson" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                    <button id="setup-geojson-upload" style="width: 100%; margin-top: 8px; padding: 10px; background: #6f42c1; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;">Upload GeoJSON</button>
+                </div>
             </div>
             
             <div style="text-align: center; margin: 20px 0; color: #adb5bd; font-weight: 600;">OR</div>
@@ -387,8 +647,18 @@
                     <input type="number" id="setup-speed" placeholder="e.g., 8" step="0.1" min="0" value="8" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px;">
                     
                     <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Number of Stations (including start and end):</label>
-                    <input type="number" id="setup-num-stations" placeholder="e.g., 5" step="1" min="2" value="3" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+                    <input type="number" id="setup-num-stations" placeholder="e.g., 5" step="1" min="2" value="3" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px;">
                     <small style="color: #6c757d; font-size: 11px;">Stations will be evenly distributed along the route</small>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <h4 style="font-size: 13px; color: #2c5aa0; margin-bottom: 8px;">Cruise Dates</h4>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Cruise Start Date & Time:</label>
+                    <input type="text" id="setup-start-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 160px; padding: 8px; margin-bottom: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif; font-size: 13px;">
+                    
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px;">Latest End Date & Time (deadline):</label>
+                    <input type="text" id="setup-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="width: 160px; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif; font-size: 13px;">
+                    <small style="color: #6c757d; font-size: 11px;">Must arrive at final station by this date/time</small>
                 </div>
                 
                 <button id="setup-submit" style="width: 100%; padding: 12px; background: #2c5aa0; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer;">Create Route</button>
@@ -403,15 +673,65 @@
             <label for="normal-speed">Default Ship Spd (knots):</label>
             <input type="number" id="normal-speed" placeholder="e.g., 10" step="0.1" min="0" value="8">
             <button id="apply-speed">Apply to All</button>
+            
+            <span style="margin-left: 20px; margin-right: 8px;">|</span>
+            
+            <label for="latest-end-datetime">Latest End Date:</label>
+            <input type="text" id="latest-end-datetime" placeholder="YYYY-MM-DD HH:MM" style="margin-left: 8px; padding: 4px 6px; border: 1px solid #1e3a6b; border-radius: 4px; font-size: 12px; width: 130px; font-family: Arial, sans-serif;">
         </div>
+        
+        <!-- Time Budget Bar (moved here from below table) -->
+        <div id="time-budget-bar" style="background: #2c5aa0; padding: 0; text-align: right; border-top: 1px solid #1e3a6b; border-bottom: 1px solid #1e3a6b; display: flex; justify-content: flex-end; align-items: stretch; gap: 15px;">
+            <!-- Marker Display Toggle -->
+            <div style="display: flex; align-items: center; padding: 8px 15px;">
+                <div style="display: flex; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                    <button id="marker-toggle-id" style="padding: 4px 12px; background: transparent; color: rgba(255,255,255,0.6); border: none; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">ID</button>
+                    <button id="marker-toggle-num" style="padding: 4px 12px; background: #1e3a6b; color: white; border: none; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;">#</button>
+                </div>
+            </div>
+            
+            <div id="time-budget" style="width: 30%; padding: 8px 20px; border-radius: 0; font-size: 14px; font-weight: 600; color: white;">
+                <strong>Time Budget:</strong> --
+            </div>
+        </div>
+        
         <div id="data-table"></div>
+        
+        <!-- Button Panel -->
         <div id="button-panel">
-            <button id="undo-btn" style="background: #6c757d;">Undo</button>
-            <button id="download-csv" style="background: #28a745;">Download CSV</button>
-            <button id="download-geojson" style="background: #6f42c1;">Download GeoJSON</button>
-            <button id="upload-csv" style="background: #17a2b8;">Upload CSV</button>
+            <!-- Undo with spacer -->
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 10px; font-weight: 600; color: transparent; margin-bottom: 4px; letter-spacing: 0.5px; visibility: hidden;">X</div>
+                <button id="undo-btn" style="background: linear-gradient(to bottom, #8a8f98, #6c757d); height: 30px; padding: 0 20px;">Undo</button>
+            </div>
+            
+            <!-- CSV Split Pill -->
+            <div style="margin-left: 20px; display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
+                <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">CSV</div>
+                <div class="split-pill" style="border-radius: 25px; padding: 0 16px; height: 30px; display: inline-flex; align-items: center; background: linear-gradient(90deg, #28a745 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #17a2b8 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
+                    <button id="download-csv-btn" style="background: transparent; border: none; padding: 0 8px 0 0; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Download</button>
+                    <div style="width: 1px; background: rgba(255,255,255,0.3); height: 60%; margin: 0 4px;"></div>
+                    <button id="upload-csv-btn" style="background: transparent; border: none; padding: 0 0 0 8px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Upload</button>
+                </div>
+            </div>
             <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
-            <button id="reset-data" style="background: #dc3545;">Reset All Data</button>
+            
+            <!-- JSON Split Pill -->
+            <div style="display: flex; flex-direction: column; align-items: center; margin-right: 15px;">
+                <div style="font-size: 10px; font-weight: 600; color: #e7f3ff; margin-bottom: 4px; letter-spacing: 0.5px;">JSON</div>
+                <div class="split-pill" style="border-radius: 25px; padding: 0 16px; height: 30px; display: inline-flex; align-items: center; background: linear-gradient(90deg, #8b5cf6 49%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, #6f42c1 51%); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);">
+                    <button id="download-geojson-btn" style="background: transparent; border: none; padding: 0 8px 0 0; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Download</button>
+                    <div style="width: 1px; background: rgba(255,255,255,0.3); height: 60%; margin: 0 4px;"></div>
+                    <button id="upload-geojson-btn" style="background: transparent; border: none; padding: 0 0 0 8px; font-size: 12px; color: white; font-weight: 600; cursor: pointer; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: all 0.2s; height: 100%;">Upload</button>
+                </div>
+            </div>
+            <input type="file" id="geojson-file-input" accept=".json,.geojson" style="display: none;">
+            
+            <!-- Reset with spacer -->
+            <div style="margin-left: auto; display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 10px; font-weight: 600; color: transparent; margin-bottom: 4px; letter-spacing: 0.5px; visibility: hidden;">X</div>
+                <button id="reset-data" style="background: linear-gradient(to bottom, #f56565, #dc3545); height: 30px; padding: 0 20px;">Reset All Data</button>
+            </div>
         </div>
     </div>
 
@@ -424,7 +744,41 @@
     <!-- Tabulator JS -->
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
     <script>
+        // Initialize flatpickr for all datetime inputs
+        const flatpickrConfig = {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true,
+            minuteIncrement: 1,
+            allowInput: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                // Add close button to calendar
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = 'Close';
+                closeBtn.className = 'flatpickr-close-button';
+                closeBtn.type = 'button';
+                closeBtn.addEventListener('click', function() {
+                    instance.close();
+                });
+                instance.calendarContainer.appendChild(closeBtn);
+            }
+        };
+        
+        // Setup modal pickers
+        flatpickr("#setup-start-datetime", {
+            ...flatpickrConfig,
+            defaultDate: new Date(new Date().setHours(9, 0, 0, 0))
+        });
+        
+        flatpickr("#setup-end-datetime", flatpickrConfig);
+        
+        // Header latest end date picker
+        flatpickr("#latest-end-datetime", flatpickrConfig);
+        
         // Draggable resizer functionality
         const resizer = document.getElementById('resizer');
         const leftPanel = document.getElementById('map');
@@ -540,11 +894,124 @@
             }
         ];
         
+        // Marine organism name lists for station naming
+        const fourLetterNouns = ['Tuna', 'Bass', 'Carp', 'Crab', 'Clam', 'Seal', 'Orca', 'Pike', 'Rudd', 'Tope', 'Hake', 'Sole', 'Ling', 'Chub', 'Dory', 'Goby', 'Newt', 'Frog', 'Toad', 'Duck', 'Swan', 'Loon', 'Coot', 'Gull', 'Tern', 'Ibis', 'Skua', 'Worm', 'Slug', 'Mola', 'Opah', 'Scad', 'Cero', 'Dace', 'Mink'];
+        const fiveLetterNouns = ['Shark', 'Trout', 'Perch', 'Bream', 'Skate', 'Smelt', 'Tench', 'Roach', 'Guppy', 'Molly', 'Tetra', 'Betta', 'Cisco', 'Porgy', 'Wahoo', 'Manta', 'Loach', 'Krill', 'Prawn', 'Shrimp', 'Snail', 'Whelk', 'Conch', 'Squid', 'Whale', 'Otter', 'Heron', 'Egret', 'Grebe', 'Stork', 'Goose', 'Crane', 'Gecko', 'Skink', 'Viper', 'Leech', 'Polyp', 'Coral', 'Hydra', 'Algae'];
+        const fourLetterAdjs = ['Huge', 'Tiny', 'Long', 'Tall', 'Wide', 'Vast', 'Blue', 'Gray', 'Pink', 'Teal', 'Soft', 'Hard', 'Dull', 'Waxy', 'Sick', 'Weak', 'Hale', 'Lame', 'Dead', 'Live', 'Wild', 'Tame', 'Calm', 'Meek', 'Bold', 'Aged', 'Fast', 'Slow', 'Spry', 'Rare', 'Lean'];
+        const fiveLetterAdjs = ['Large', 'Small', 'Giant', 'Gross', 'Stout', 'Lanky', 'Black', 'White', 'Brown', 'Green', 'Fuzzy', 'Hairy', 'Scaly', 'Slimy', 'Shiny', 'Sleek', 'Silky', 'Downy', 'Bushy', 'Leafy', 'Spiny', 'Alive', 'Frail', 'Hardy', 'Plump', 'Gaunt', 'Timid', 'Brave', 'Fierce', 'Agile', 'Young', 'Adult', 'Prime', 'Quick', 'Swift', 'Fleet', 'Nippy', 'Barred', 'Noble', 'Feral', 'Stray', 'Local', 'Alien'];
+        
+        // Track used station names to prevent duplicates
+        const usedStationNames = new Set();
+        
+        // Generate a unique marine organism station name
+        function generateStationName() {
+            const maxAttempts = 1000;
+            let attempts = 0;
+            
+            while (attempts < maxAttempts) {
+                // Randomly choose between two patterns:
+                // Pattern 1: 4-letter adj + 5-letter noun (e.g., "Huge_Shark")
+                // Pattern 2: 5-letter adj + 4-letter noun (e.g., "Large_Tuna")
+                const pattern = Math.random() < 0.5 ? 1 : 2;
+                
+                let name;
+                if (pattern === 1) {
+                    const adj = fourLetterAdjs[Math.floor(Math.random() * fourLetterAdjs.length)];
+                    const noun = fiveLetterNouns[Math.floor(Math.random() * fiveLetterNouns.length)];
+                    name = adj + '_' + noun;
+                } else {
+                    const adj = fiveLetterAdjs[Math.floor(Math.random() * fiveLetterAdjs.length)];
+                    const noun = fourLetterNouns[Math.floor(Math.random() * fourLetterNouns.length)];
+                    name = adj + '_' + noun;
+                }
+                
+                if (!usedStationNames.has(name)) {
+                    usedStationNames.add(name);
+                    return name;
+                }
+                
+                attempts++;
+            }
+            
+            // Fallback if we somehow run out (very unlikely)
+            return 'Station_' + Date.now();
+        }
+        
+        // Rebuild used station names from existing data
+        function rebuildUsedStationNames() {
+            usedStationNames.clear();
+            routeData.forEach(station => {
+                usedStationNames.add(station.stationId);
+            });
+        }
+        
+        // Generate unique station ID (2 letters, or 3 if exhausted)
+        const usedStationCodes = new Set();
+        
+        function generateStationCode() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            // Try 2-letter combinations first (676 possibilities)
+            if (usedStationCodes.size < 676) {
+                let code;
+                do {
+                    const letter1 = letters[Math.floor(Math.random() * 26)];
+                    const letter2 = letters[Math.floor(Math.random() * 26)];
+                    code = letter1 + letter2;
+                } while (usedStationCodes.has(code));
+                
+                usedStationCodes.add(code);
+                return code;
+            }
+            
+            // If 2-letter codes exhausted, use 3-letter codes (17,576 possibilities)
+            let code;
+            do {
+                const letter1 = letters[Math.floor(Math.random() * 26)];
+                const letter2 = letters[Math.floor(Math.random() * 26)];
+                const letter3 = letters[Math.floor(Math.random() * 26)];
+                code = letter1 + letter2 + letter3;
+            } while (usedStationCodes.has(code));
+            
+            usedStationCodes.add(code);
+            return code;
+        }
+        
+        // Initialize station codes from existing data
+        function initializeStationCodes() {
+            usedStationCodes.clear();
+            routeData.forEach(station => {
+                if (station.stationCode) {
+                    usedStationCodes.add(station.stationCode);
+                }
+            });
+        }
+        
         // Load data from localStorage or use default
         let routeData = loadRouteData();
         
+        // Marker display mode: 'id' or 'number' (default to 'number')
+        let markerDisplayMode = localStorage.getItem('markerDisplayMode') || 'number';
+        
+        // Initialize station codes from existing data
+        initializeStationCodes();
+        
+        // Initialize used station names from existing data
+        rebuildUsedStationNames();
+        
+        // Ensure all stations have station codes
+        routeData.forEach(station => {
+            if (!station.stationCode) {
+                station.stationCode = generateStationCode();
+            }
+        });
+        
         // Check if this is first time setup
         let isFirstSetup = !localStorage.getItem('shipRouteData');
+        
+        // Cruise dates
+        let cruiseStartDate = localStorage.getItem('cruiseStartDate') || '';
+        let latestEndDate = localStorage.getItem('latestEndDate') || '';
         
         // History tracking for undo functionality
         let history = [];
@@ -571,13 +1038,14 @@
                 // Get previous state
                 routeData = history.pop();
                 
-                // Update everything
+                // Update everything except times (already in the saved state)
                 updateDistances();
-                calculateTimes();
+                // Do NOT call calculateTimes() - times are already in the restored state
                 initializeMap();
                 table.setData(routeData);
                 saveRouteData();
                 updateUndoButton();
+                updateTimeBudget();
             }
         }
         
@@ -590,6 +1058,64 @@
             } else {
                 undoBtn.disabled = true;
                 undoBtn.title = 'No actions to undo';
+            }
+        }
+        
+        // Function to calculate and display time budget
+        function updateTimeBudget() {
+            const budgetSpan = document.getElementById('time-budget');
+            
+            if (!latestEndDate) {
+                budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                budgetSpan.style.backgroundColor = 'transparent';
+                budgetSpan.style.color = 'white';
+                return;
+            }
+            
+            // Get the last station's arrival time
+            if (routeData.length === 0) {
+                budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                budgetSpan.style.backgroundColor = 'transparent';
+                budgetSpan.style.color = 'white';
+                return;
+            }
+            
+            const lastStation = routeData[routeData.length - 1];
+            const arrivalTime = parseDateTime(lastStation.arrival);
+            const deadline = new Date(latestEndDate);
+            
+            if (!arrivalTime) {
+                budgetSpan.innerHTML = '<strong>Time Budget:</strong> --';
+                budgetSpan.style.backgroundColor = 'transparent';
+                budgetSpan.style.color = 'white';
+                return;
+            }
+            
+            // Calculate difference in hours
+            const diffMs = deadline - arrivalTime;
+            const diffHours = diffMs / (1000 * 60 * 60);
+            
+            // Format the budget (days and hours only, no minutes)
+            const absDiffHours = Math.abs(diffHours);
+            const days = Math.floor(absDiffHours / 24);
+            const hours = Math.floor(absDiffHours % 24);
+            
+            let budgetText = '';
+            if (days > 0) {
+                budgetText = `${diffHours >= 0 ? '+' : '-'}${days}d ${hours}h`;
+            } else {
+                budgetText = `${diffHours >= 0 ? '+' : '-'}${hours}h`;
+            }
+            
+            budgetSpan.innerHTML = `<strong>Time Budget:</strong> ${budgetText}`;
+            
+            // Darker colors with white text
+            if (diffHours >= 0) {
+                budgetSpan.style.backgroundColor = '#1e7e34'; // Dark green
+                budgetSpan.style.color = 'white';
+            } else {
+                budgetSpan.style.backgroundColor = '#bd2130'; // Dark red
+                budgetSpan.style.color = 'white';
             }
         }
         
@@ -614,13 +1140,14 @@
                     stationId = endName;
                     comments = "Destination";
                 } else {
-                    stationId = `Station-${i + 1}`;
+                    stationId = generateStationName();
                     comments = "";
                 }
                 
                 route.push({
                     id: i + 1,
                     stationId: stationId,
+                    stationCode: generateStationCode(),
                     lat: lat,
                     lng: lng,
                     distance: 0,
@@ -656,6 +1183,9 @@
             const defaultSpeed = document.getElementById('setup-speed').value || '8';
             const numStations = document.getElementById('setup-num-stations').value || '3';
             
+            const startDateTime = document.getElementById('setup-start-datetime').value;
+            const endDateTime = document.getElementById('setup-end-datetime').value;
+            
             if (!startLat || !startLng || !endLat || !endLng) {
                 alert('Please enter all latitude and longitude values.');
                 return;
@@ -664,8 +1194,25 @@
             // Update the main default speed input
             document.getElementById('normal-speed').value = defaultSpeed;
             
+            // Save cruise dates
+            if (startDateTime) {
+                cruiseStartDate = startDateTime.replace(' ', 'T');
+                localStorage.setItem('cruiseStartDate', cruiseStartDate);
+            }
+            
+            if (endDateTime) {
+                latestEndDate = endDateTime.replace(' ', 'T');
+                localStorage.setItem('latestEndDate', latestEndDate);
+                document.getElementById('latest-end-datetime').value = endDateTime;
+            }
+            
             // Create new route
             routeData = createRouteFromPositions(startName, startLat, startLng, endName, endLat, endLng, numStations);
+            
+            // Set departure time of first station to cruise start date if provided
+            if (startDateTime) {
+                routeData[0].departure = startDateTime;
+            }
             
             // Apply the default speed to all stations
             routeData.forEach(function(point) {
@@ -679,6 +1226,7 @@
             initializeMap(); // This already includes zoom to fit
             table.setData(routeData);
             saveRouteData();
+            updateTimeBudget();
             
             hideSetupModal();
         });
@@ -708,19 +1256,28 @@
                     dataLines.forEach(function(line, index) {
                         const values = parseCSVLine(line);
                         
+                        // Support both old format (9 columns) and new format (10 columns with Station Code)
                         if (values.length >= 9) {
+                            const hasStationCode = values.length >= 10;
+                            
                             newRouteData.push({
                                 id: index + 1,
-                                stationId: values[0] || `Station-${index + 1}`,
-                                lat: parseFloat(values[1]) || 0,
-                                lng: parseFloat(values[2]) || 0,
-                                distance: parseFloat(values[3]) || 0,
-                                speed: values[4] || '8',
-                                arrival: values[5] || '',
-                                departure: values[6] || '',
-                                duration: values[7] || '0',
-                                comments: values[8] || ''
+                                stationId: values[0] || generateStationName(),
+                                stationCode: hasStationCode && values[1] ? values[1] : generateStationCode(),
+                                lat: parseFloat(values[hasStationCode ? 2 : 1]) || 0,
+                                lng: parseFloat(values[hasStationCode ? 3 : 2]) || 0,
+                                distance: parseFloat(values[hasStationCode ? 4 : 3]) || 0,
+                                speed: values[hasStationCode ? 5 : 4] || '8',
+                                arrival: values[hasStationCode ? 6 : 5] || '',
+                                departure: values[hasStationCode ? 7 : 6] || '',
+                                duration: values[hasStationCode ? 8 : 7] || '0',
+                                comments: values[hasStationCode ? 9 : 8] || ''
                             });
+                            
+                            // Track the station code if provided
+                            if (hasStationCode && values[1]) {
+                                usedStationCodes.add(values[1]);
+                            }
                         }
                     });
                     
@@ -738,6 +1295,77 @@
                     }
                 } catch (error) {
                     alert('Error parsing CSV file: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        });
+        
+        // Setup GeoJSON Upload Handler
+        document.getElementById('setup-geojson-upload').addEventListener('click', function() {
+            const fileInput = document.getElementById('setup-geojson-input');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a GeoJSON file first.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const geojson = JSON.parse(e.target.result);
+                    
+                    if (!geojson.features || !Array.isArray(geojson.features)) {
+                        alert('Invalid GeoJSON format. Must contain a "features" array.');
+                        return;
+                    }
+                    
+                    const newRouteData = [];
+                    
+                    geojson.features.forEach(function(feature, index) {
+                        if (feature.geometry && feature.geometry.type === 'Point') {
+                            const coords = feature.geometry.coordinates;
+                            const props = feature.properties || {};
+                            
+                            // Extract station name from properties (name or stationId)
+                            const stationName = props.name || props.stationId || generateStationName();
+                            const stationCode = props.stationCode || generateStationCode();
+                            
+                            newRouteData.push({
+                                id: index + 1,
+                                stationId: stationName,
+                                stationCode: stationCode,
+                                lat: coords[1], // GeoJSON uses [lng, lat]
+                                lng: coords[0],
+                                distance: parseFloat(props.distance) || 0,
+                                speed: props.speed || '8',
+                                arrival: props.arrive || props.arrival || '',
+                                departure: props.departure || '',
+                                duration: props.duration || '0',
+                                comments: props.comments || ''
+                            });
+                            
+                            // Track the station code
+                            usedStationCodes.add(stationCode);
+                        }
+                    });
+                    
+                    if (newRouteData.length > 0) {
+                        routeData = newRouteData;
+                        updateDistances();
+                        calculateTimes();
+                        ensureDefaultSpeed();
+                        initializeMap();
+                        table.setData(routeData);
+                        saveRouteData();
+                        hideSetupModal();
+                    } else {
+                        alert('No valid Point features found in GeoJSON file.');
+                    }
+                } catch (error) {
+                    alert('Error parsing GeoJSON file: ' + error.message);
                 }
             };
             
@@ -772,12 +1400,29 @@
             try {
                 const saved = localStorage.getItem('shipRouteData');
                 if (saved) {
-                    return JSON.parse(saved);
+                    const data = JSON.parse(saved);
+                    
+                    // Ensure all stations have station codes
+                    data.forEach(station => {
+                        if (!station.stationCode) {
+                            station.stationCode = generateStationCode();
+                        }
+                    });
+                    
+                    return data;
                 }
             } catch (e) {
                 console.error('Error loading from localStorage:', e);
             }
-            return JSON.parse(JSON.stringify(defaultRouteData)); // Return a copy of default data
+            
+            // Default data - ensure it has station codes
+            const data = JSON.parse(JSON.stringify(defaultRouteData));
+            data.forEach(station => {
+                if (!station.stationCode) {
+                    station.stationCode = generateStationCode();
+                }
+            });
+            return data;
         }
         
         function resetRouteData() {
@@ -856,11 +1501,15 @@
                             // Calculate arrival time (add travel time in hours)
                             const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
                             point.arrival = formatDateTime(arrivalDate);
+                            // Clear manual flag since this is calculated
+                            point.arrival_manual = false;
                             
                             // Calculate departure time based on duration
                             const duration = parseFloat(point.duration) || 0;
                             const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
                             point.departure = formatDateTime(departureDate);
+                            // Clear manual flag since this is calculated
+                            point.departure_manual = false;
                         }
                     }
                 }
@@ -889,25 +1538,139 @@
             return `${year}-${month}-${day} ${hours}:${minutes}`;
         }
         
+        // Rebuild datetime cell to add unselect button
+        function rebuildDateTimeCell(cell, input, rowIndex, field) {
+            // Check if button already exists
+            const existingContainer = cell.querySelector('.datetime-input-container');
+            if (existingContainer) {
+                return; // Already has button
+            }
+            
+            // Clear the cell
+            cell.innerHTML = '';
+            
+            // Create container
+            const container = document.createElement('div');
+            container.className = 'datetime-input-container';
+            
+            // Move the input to the container
+            container.appendChild(input);
+            
+            // Create unselect button
+            const unselectBtn = document.createElement('button');
+            unselectBtn.className = 'unselect-btn';
+            unselectBtn.innerHTML = '✕';
+            unselectBtn.type = 'button';
+            unselectBtn.title = 'Clear manual setting';
+            unselectBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                clearManualDateTime(rowIndex, field);
+            });
+            
+            container.appendChild(unselectBtn);
+            cell.appendChild(container);
+        }
+        
+        // Clear manual datetime setting and recalculate only the next station
+        function clearManualDateTime(rowIndex, field) {
+            saveToHistory();
+            
+            // Clear the manual flag
+            routeData[rowIndex][field + '_manual'] = false;
+            
+            // Only recalculate the next station's arrival (not all downstream)
+            if (field === 'departure') {
+                const nextIndex = rowIndex + 1;
+                if (nextIndex < routeData.length) {
+                    const current = routeData[rowIndex];
+                    const next = routeData[nextIndex];
+                    
+                    if (current.departure) {
+                        const segmentDistance = next.distance - current.distance;
+                        let speed = parseFloat(next.speed);
+                        if (!speed || speed <= 0) {
+                            speed = parseFloat(current.speed);
+                        }
+                        
+                        if (speed && speed > 0) {
+                            const travelTimeHours = segmentDistance / speed;
+                            const prevDeparture = parseDateTime(current.departure);
+                            if (prevDeparture !== null) {
+                                const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                                next.arrival = formatDateTime(arrivalDate);
+                                next.arrival_manual = false;
+                                
+                                // Recalculate next station's departure only if not manually set
+                                if (!next.departure_manual) {
+                                    const duration = parseFloat(next.duration) || 0;
+                                    const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                    next.departure = formatDateTime(departureDate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // For arrival, no recalculation needed (calculated from previous departure)
+            
+            // Update the table display
+            updateTableData();
+            saveRouteData();
+            updateTimeBudget();
+        }
+        
         // Create draggable marker
         function createMarker(lat, lng, index) {
             const isStartOrEnd = (index === 0 || index === routeData.length - 1);
             
-            // Create SVG icon for round marker
-            const svgIcon = L.divIcon({
-                html: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10" cy="10" r="8" fill="${isStartOrEnd ? '#ff0000' : '#3388ff'}" stroke="#fff" stroke-width="2"/>
-                </svg>`,
-                className: 'svg-marker',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            });
+            let marker;
             
-            const marker = L.marker([lat, lng], {
-                icon: svgIcon,
-                draggable: true,
-                autoPan: true
-            }).addTo(map);
+            // For intermediate stations (not first or last), use number label or ID as the marker
+            if (index > 0 && index < routeData.length - 1) {
+                const displayText = markerDisplayMode === 'id' ? (routeData[index].stationCode || 'XX') : index;
+                
+                marker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        html: `<div style="
+                            background: white;
+                            border: 2px solid #3388ff;
+                            border-radius: 50%;
+                            width: 28px;
+                            height: 28px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: ${markerDisplayMode === 'id' ? '10px' : '13px'};
+                            color: #333;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                            cursor: move;
+                        ">${displayText}</div>`,
+                        className: 'number-marker',
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    }),
+                    draggable: true,
+                    autoPan: true
+                }).addTo(map);
+            } else {
+                // For start and end points, use traditional circular SVG marker
+                const svgIcon = L.divIcon({
+                    html: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="8" fill="#ff0000" stroke="#fff" stroke-width="2"/>
+                    </svg>`,
+                    className: 'svg-marker',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+                
+                marker = L.marker([lat, lng], {
+                    icon: svgIcon,
+                    draggable: true,
+                    autoPan: true
+                }).addTo(map);
+            }
             
             marker.stationIndex = index;
             
@@ -927,8 +1690,9 @@
                     updateDistances();
                     calculateTimes();
                     updatePolyline();
-                    table.setData(routeData);
+                    updateTableData();
                     saveRouteData();
+                    updateTimeBudget();
                 }
             });
             
@@ -948,10 +1712,9 @@
                             
                             routeData.splice(currentIndex, 1);
                             
-                            // Reassign IDs
+                            // Only reassign IDs (preserve custom station names)
                             routeData.forEach((point, idx) => {
                                 point.id = idx + 1;
-                                point.stationId = `Station-${idx + 1}`;
                             });
                             
                             updateDistances();
@@ -959,6 +1722,7 @@
                             initializeMap();
                             table.setData(routeData);
                             saveRouteData();
+                            updateTimeBudget();
                         }
                     }
                 });
@@ -969,9 +1733,90 @@
                 });
             }
             
-            marker.bindPopup(`Station ${index + 1}${isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''}`);
+            marker.bindPopup(routeData[index].stationId + ' (' + routeData[index].stationCode + ')' + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : ''));
             
             return marker;
+        }
+        
+        // Update marker popups with current station names
+        function updateMarkerPopups() {
+            markers.forEach((marker, index) => {
+                if (marker && routeData[index]) {
+                    const isStartOrEnd = index === 0 || index === routeData.length - 1;
+                    const popupContent = routeData[index].stationId + ' (' + routeData[index].stationCode + ')' + (isStartOrEnd ? (index === 0 ? ' (Start)' : ' (End)') : '');
+                    marker.setPopupContent(popupContent);
+                }
+            });
+        }
+        
+        // Update table data while preserving scroll position
+        function updateTableData() {
+            // Get current scroll position
+            const tableHolder = document.querySelector('.tabulator-tableholder');
+            const scrollTop = tableHolder ? tableHolder.scrollTop : 0;
+            
+            // Update data
+            table.setData(routeData);
+            
+            // Restore scroll position after a brief delay to ensure render is complete
+            setTimeout(() => {
+                if (tableHolder) {
+                    tableHolder.scrollTop = scrollTop;
+                }
+            }, 0);
+        }
+        
+        // Update specific cells without re-rendering entire table
+        function updateCellValues(startIndex) {
+            // Update all rows from startIndex forward with new calculated values
+            for (let i = startIndex; i < routeData.length; i++) {
+                const rowData = routeData[i];
+                
+                // Find all inputs for this row and update their values
+                const rowElement = document.querySelector(`[data-row-index="${i}"]`)?.closest('.custom-row-container');
+                
+                if (rowElement) {
+                    // Update arrival input
+                    const arrivalInput = rowElement.querySelector(`input[data-field="arrival"][data-row-index="${i}"]`);
+                    if (arrivalInput) {
+                        // Update the manually-set class based on routeData flag
+                        if (rowData.arrival_manual) {
+                            arrivalInput.classList.add('manually-set');
+                        } else {
+                            arrivalInput.classList.remove('manually-set');
+                        }
+                        
+                        if (arrivalInput._flatpickr) {
+                            arrivalInput._flatpickr.setDate(rowData.arrival, false);
+                        } else {
+                            arrivalInput.value = rowData.arrival || '';
+                        }
+                    }
+                    
+                    // Update departure input
+                    const departureInput = rowElement.querySelector(`input[data-field="departure"][data-row-index="${i}"]`);
+                    if (departureInput) {
+                        // Update the manually-set class based on routeData flag
+                        if (rowData.departure_manual) {
+                            departureInput.classList.add('manually-set');
+                        } else {
+                            departureInput.classList.remove('manually-set');
+                        }
+                        
+                        if (departureInput._flatpickr) {
+                            departureInput._flatpickr.setDate(rowData.departure, false);
+                        } else {
+                            departureInput.value = rowData.departure || '';
+                        }
+                    }
+                    
+                    // Update duration input
+                    const durationInput = rowElement.querySelector(`input[data-field="duration"][data-row-index="${i}"]`);
+                    if (durationInput) {
+                        durationInput.value = rowData.duration || '';
+                    }
+                }
+            }
         }
         
         // Update polyline
@@ -1018,7 +1863,8 @@
                     // Insert new point
                     const newPoint = {
                         id: insertIndex + 1,
-                        stationId: `Station-${insertIndex + 1}`,
+                        stationId: generateStationName(),
+                        stationCode: generateStationCode(),
                         lat: parseFloat(clickedLatLng.lat.toFixed(6)),
                         lng: parseFloat(clickedLatLng.lng.toFixed(6)),
                         distance: 0,
@@ -1031,10 +1877,9 @@
                     
                     routeData.splice(insertIndex, 0, newPoint);
                     
-                    // Reassign IDs and station names
+                    // Only reassign IDs (preserve custom station names)
                     routeData.forEach((point, idx) => {
                         point.id = idx + 1;
-                        point.stationId = `Station-${idx + 1}`;
                     });
                     
                     updateDistances();
@@ -1042,6 +1887,7 @@
                     initializeMap();
                     table.setData(routeData);
                     saveRouteData();
+                    updateTimeBudget();
                 }
             });
         }
@@ -1079,42 +1925,205 @@
                 updateDistances();
                 calculateTimes();
                 updatePolyline();
-                table.setData(routeData);
+                updateTableData();
                 saveRouteData();
+                updateTimeBudget();
             } else if (field === "speed" || field === "duration") {
-                // Recalculate times when speed or duration changes
-                calculateTimes();
-                table.setData(routeData);
+                // When speed or duration changes, recalculate times from this point forward
+                
+                // Special handling for duration changes: update current station's departure first
+                if (field === "duration" && index > 0 && routeData[index].arrival) {
+                    const arrivalDate = parseDateTime(routeData[index].arrival);
+                    if (arrivalDate) {
+                        const duration = parseFloat(routeData[index].duration) || 0;
+                        const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                        routeData[index].departure = formatDateTime(departureDate);
+                        // Keep the manual flag as it was - don't change it
+                    }
+                }
+                
+                // Recalculate all stations from the next one forward
+                // Handle manual times intelligently: update what we can, preserve manual settings
+                for (let i = index + 1; i < routeData.length; i++) {
+                    const point = routeData[i];
+                    const prev = routeData[i - 1];
+                    const segmentDistance = point.distance - prev.distance;
+                    let speed = parseFloat(point.speed);
+                    if (!speed || speed <= 0) {
+                        speed = parseFloat(prev.speed);
+                    }
+                    
+                    if (speed && speed > 0 && prev.departure) {
+                        const travelTimeHours = segmentDistance / speed;
+                        const prevDeparture = parseDateTime(prev.departure);
+                        if (prevDeparture !== null) {
+                            const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                            
+                            // Handle different manual time scenarios
+                            if (point.arrival_manual && point.departure_manual) {
+                                // Both times are manual - can't recalculate anything, stop here
+                                break;
+                            } else if (point.departure_manual && !point.arrival_manual) {
+                                // Departure is manual, update arrival and duration
+                                point.arrival = formatDateTime(arrivalDate);
+                                point.arrival_manual = false;
+                                
+                                // Recalculate duration based on new arrival and manual departure
+                                const departureDate = parseDateTime(point.departure);
+                                if (departureDate !== null) {
+                                    const durationMs = departureDate.getTime() - arrivalDate.getTime();
+                                    const durationHours = durationMs / (1000 * 60 * 60);
+                                    point.duration = Math.round(durationHours * 100) / 100;
+                                }
+                                // Continue forward from this manual departure
+                            } else if (point.arrival_manual && !point.departure_manual) {
+                                // Arrival is manual - recalculate departure from manual arrival + duration
+                                const manualArrival = parseDateTime(point.arrival);
+                                if (manualArrival !== null) {
+                                    const duration = parseFloat(point.duration) || 0;
+                                    const departureDate = new Date(manualArrival.getTime() + duration * 3600000);
+                                    point.departure = formatDateTime(departureDate);
+                                    point.departure_manual = false;
+                                }
+                                // Continue forward from this calculated departure
+                            } else {
+                                // Neither is manual - calculate both normally
+                                point.arrival = formatDateTime(arrivalDate);
+                                point.arrival_manual = false;
+                                
+                                const duration = parseFloat(point.duration) || 0;
+                                const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                point.departure = formatDateTime(departureDate);
+                                point.departure_manual = false;
+                            }
+                        }
+                    }
+                }
+                
+                // Update the display for the current station and all affected stations
+                updateCellValues(index);
+                
                 saveRouteData();
+                updateTimeBudget();
             } else if (field === "departure") {
-                // When departure is manually edited, recalculate from this point forward
-                calculateTimesFromIndex(index);
-                table.setData(routeData);
+                // When departure is manually edited, recalculate only up to next manual time
+                const recalcStartIndex = index + 1;
+                let recalcEndIndex = routeData.length;
+                
+                // Find next manual time after this index
+                for (let i = recalcStartIndex; i < routeData.length; i++) {
+                    if (routeData[i].arrival_manual || routeData[i].departure_manual) {
+                        recalcEndIndex = i;
+                        break;
+                    }
+                }
+                
+                // Recalculate only between this departure and next manual time
+                for (let i = recalcStartIndex; i < recalcEndIndex; i++) {
+                    const point = routeData[i];
+                    const prev = routeData[i - 1];
+                    const segmentDistance = point.distance - prev.distance;
+                    let speed = parseFloat(point.speed);
+                    if (!speed || speed <= 0) {
+                        speed = parseFloat(prev.speed);
+                    }
+                    
+                    if (speed && speed > 0 && prev.departure) {
+                        const travelTimeHours = segmentDistance / speed;
+                        const prevDeparture = parseDateTime(prev.departure);
+                        if (prevDeparture !== null) {
+                            const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                            point.arrival = formatDateTime(arrivalDate);
+                            point.arrival_manual = false;
+                            
+                            const duration = parseFloat(point.duration) || 0;
+                            const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                            point.departure = formatDateTime(departureDate);
+                            point.departure_manual = false;
+                        }
+                    }
+                }
+                
+                updateCellValues(recalcStartIndex);
                 saveRouteData();
+                updateTimeBudget();
             } else if (field === "arrival") {
-                // When arrival is manually edited, update departure based on duration, then recalculate forward
+                // When arrival is manually edited, update departure based on duration
                 if (index > 0) {
                     const duration = parseFloat(routeData[index].duration) || 0;
                     const arrivalDate = parseDateTime(routeData[index].arrival);
                     if (arrivalDate) {
                         const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
                         routeData[index].departure = formatDateTime(departureDate);
+                        // Mark departure as calculated (derived from manual arrival)
+                        routeData[index].departure_manual = false;
                     }
-                    calculateTimesFromIndex(index);
-                    table.setData(routeData);
+                    
+                    // Recalculate only up to next manual time
+                    const recalcStartIndex = index + 1;
+                    let recalcEndIndex = routeData.length;
+                    
+                    // Find next manual time after this index
+                    for (let i = recalcStartIndex; i < routeData.length; i++) {
+                        if (routeData[i].arrival_manual || routeData[i].departure_manual) {
+                            recalcEndIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // Recalculate only between this arrival and next manual time
+                    for (let i = recalcStartIndex; i < recalcEndIndex; i++) {
+                        const point = routeData[i];
+                        const prev = routeData[i - 1];
+                        const segmentDistance = point.distance - prev.distance;
+                        let speed = parseFloat(point.speed);
+                        if (!speed || speed <= 0) {
+                            speed = parseFloat(prev.speed);
+                        }
+                        
+                        if (speed && speed > 0 && prev.departure) {
+                            const travelTimeHours = segmentDistance / speed;
+                            const prevDeparture = parseDateTime(prev.departure);
+                            if (prevDeparture !== null) {
+                                const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                                point.arrival = formatDateTime(arrivalDate);
+                                point.arrival_manual = false;
+                                
+                                const duration = parseFloat(point.duration) || 0;
+                                const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                point.departure = formatDateTime(departureDate);
+                                point.departure_manual = false;
+                            }
+                        }
+                    }
+                    
+                    updateCellValues(index); // Update this row's departure and subsequent rows
                     saveRouteData();
+                    updateTimeBudget();
                 }
+            } else if (field === "stationId") {
+                // Update the marker popup when station name changes
+                updateMarkerPopups();
+                saveRouteData();
             } else {
-                // For other fields (stationId), just save
+                // For other fields (comments), just save
                 saveRouteData();
             }
         }
         
         // Initialize everything
         updateDistances();
-        calculateTimes();
+        // Do NOT call calculateTimes() here - it would overwrite manual time flags loaded from storage
+        // Times are already in the loaded data
         ensureDefaultSpeed(); // Make sure all speeds are populated
         updateUndoButton(); // Initialize undo button state
+        
+        // Load cruise dates if they exist
+        if (latestEndDate) {
+            // Convert from ISO format (YYYY-MM-DDTHH:MM) to display format (YYYY-MM-DD HH:MM)
+            const displayDate = latestEndDate.replace('T', ' ');
+            document.getElementById('latest-end-datetime').value = displayDate;
+        }
         
         console.log('isFirstSetup:', isFirstSetup);
         console.log('localStorage data:', localStorage.getItem('shipRouteData'));
@@ -1123,7 +2132,11 @@
         table = new Tabulator("#data-table", {
             data: routeData,
             height: "100%",
-            layout: "fitData",
+            layout: "fitColumns",
+            pagination: true,
+            paginationSize: 20,
+            paginationSizeSelector: [10, 20, 50, 100],
+            paginationCounter: "rows",
             rowFormatter: function(row) {
                 const data = row.getData();
                 const rowIndex = row.getPosition() - 1;
@@ -1139,14 +2152,14 @@
                 
                 // Define columns with widths - MUST match header column widths exactly
                 const columns = [
-                    { field: 'stationId', width: '90px', editable: true, compact: false, flex: false },
+                    { field: 'stationId', width: '130px', editable: true, compact: false, flex: false },
                     { field: 'lat', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'lng', width: '65px', editable: true, formatter: (val) => parseFloat(val).toFixed(6), compact: true, flex: false },
                     { field: 'distance', width: '55px', editable: false, formatter: (val) => parseFloat(val).toFixed(2), compact: true, flex: false },
-                    { field: 'speed', width: '50px', editable: true, compact: true, flex: false },
-                    { field: 'arrival', width: '205px', editable: true, compact: false, flex: false },
-                    { field: 'departure', width: '205px', editable: true, compact: false, flex: false },
-                    { field: 'duration', width: '70px', editable: true, compact: false, flex: false }
+                    { field: 'speed', width: '40px', editable: true, compact: true, flex: false },
+                    { field: 'arrival', width: '135px', editable: true, compact: false, flex: false },
+                    { field: 'departure', width: '135px', editable: true, compact: false, flex: false },
+                    { field: 'duration', width: '45px', editable: true, compact: false, flex: false }
                 ];
                 
                 columns.forEach(col => {
@@ -1172,86 +2185,140 @@
                     const value = col.formatter ? col.formatter(data[col.field]) : data[col.field];
                     
                     if (isEditable) {
-                        // Use separate date and time inputs for arrival and departure fields
-                        if (col.field === 'arrival' || col.field === 'departure') {
-                            // Create a container for date and time inputs
-                            const dateTimeContainer = document.createElement('div');
-                            dateTimeContainer.style.display = 'flex';
-                            dateTimeContainer.style.gap = '1px';
+                        // Special handling for stationId - show with code but only allow editing name
+                        if (col.field === 'stationId') {
+                            const container = document.createElement('div');
+                            container.style.display = 'flex';
+                            container.style.alignItems = 'center';
+                            container.style.gap = '4px';
                             
-                            // Date input
-                            const dateInput = document.createElement('input');
-                            dateInput.type = 'date';
-                            dateInput.style.width = '105px';
-                            dateInput.style.fontSize = '10px';
-                            dateInput.style.padding = '1px 2px';
-                            dateInput.style.border = '1px solid #dee2e6';
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = value || '';
+                            input.style.flex = '1';
+                            input.style.minWidth = '0';
+                            input.dataset.field = col.field;
+                            input.dataset.rowIndex = rowIndex;
                             
-                            // Hour dropdown (00-23)
-                            const hourSelect = document.createElement('select');
-                            hourSelect.style.width = '48px';
-                            hourSelect.style.fontSize = '11px';
-                            hourSelect.style.padding = '2px';
-                            hourSelect.style.border = '1px solid #dee2e6';
-                            for (let h = 0; h < 24; h++) {
-                                const option = document.createElement('option');
-                                option.value = String(h).padStart(2, '0');
-                                option.textContent = String(h).padStart(2, '0');
-                                hourSelect.appendChild(option);
+                            input.addEventListener('change', function() {
+                                // Save state before modification
+                                saveToHistory();
+                                
+                                routeData[rowIndex][col.field] = this.value;
+                                handleFieldUpdate(col.field, rowIndex);
+                            });
+                            
+                            const codeSpan = document.createElement('span');
+                            codeSpan.textContent = ' (' + data.stationCode + ')';
+                            codeSpan.style.fontSize = '10px';
+                            codeSpan.style.color = '#6c757d';
+                            codeSpan.style.fontWeight = '600';
+                            codeSpan.style.whiteSpace = 'nowrap';
+                            codeSpan.style.marginLeft = '4px';
+                            
+                            container.appendChild(input);
+                            container.appendChild(codeSpan);
+                            cell.appendChild(container);
+                        }
+                        // Use flatpickr for arrival and departure fields
+                        else if (col.field === 'arrival' || col.field === 'departure') {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = value || '';
+                            input.placeholder = 'YYYY-MM-DD HH:MM';
+                            input.style.fontFamily = 'Arial, sans-serif';
+                            input.style.fontSize = '11px';
+                            input.style.padding = '2px 4px';
+                            input.style.width = '100%';
+                            input.className = 'flatpickr-input'; // Add class for CSS styling
+                            input.dataset.field = col.field;
+                            input.dataset.rowIndex = rowIndex;
+                            
+                            // Check if this datetime was manually set (stored in routeData)
+                            const isManuallySet = routeData[rowIndex][col.field + '_manual'];
+                            if (isManuallySet) {
+                                input.classList.add('manually-set');
                             }
                             
-                            // Minute dropdown (00-59)
-                            const minuteSelect = document.createElement('select');
-                            minuteSelect.style.width = '48px';
-                            minuteSelect.style.fontSize = '11px';
-                            minuteSelect.style.padding = '2px';
-                            minuteSelect.style.border = '1px solid #dee2e6';
-                            for (let m = 0; m < 60; m++) {
-                                const option = document.createElement('option');
-                                option.value = String(m).padStart(2, '0');
-                                option.textContent = String(m).padStart(2, '0');
-                                minuteSelect.appendChild(option);
-                            }
-                            
-                            // Parse existing value "YYYY-MM-DD HH:MM"
-                            if (value) {
-                                const parts = value.split(' ');
-                                if (parts.length === 2) {
-                                    dateInput.value = parts[0]; // YYYY-MM-DD
-                                    const timeParts = parts[1].split(':');
-                                    if (timeParts.length === 2) {
-                                        hourSelect.value = timeParts[0]; // HH
-                                        minuteSelect.value = timeParts[1]; // MM
+                            // Initialize flatpickr and store instance on input
+                            input._flatpickr = flatpickr(input, {
+                                enableTime: true,
+                                dateFormat: "Y-m-d H:i",
+                                time_24hr: true,
+                                minuteIncrement: 1,
+                                allowInput: true,
+                                onReady: function(selectedDates, dateStr, instance) {
+                                    // Add close button to calendar
+                                    const closeBtn = document.createElement('button');
+                                    closeBtn.innerHTML = 'Close';
+                                    closeBtn.className = 'flatpickr-close-button';
+                                    closeBtn.type = 'button';
+                                    closeBtn.addEventListener('click', function() {
+                                        instance.close();
+                                    });
+                                    instance.calendarContainer.appendChild(closeBtn);
+                                },
+                                onClose: function(selectedDates, dateStr, instance) {
+                                    if (dateStr) {
+                                        saveToHistory();
+                                        routeData[rowIndex][col.field] = dateStr;
+                                        // Mark as manually set
+                                        routeData[rowIndex][col.field + '_manual'] = true;
+                                        input.classList.add('manually-set');
+                                        input.value = dateStr;
+                                        
+                                        // Calculate duration if departure time is being set
+                                        if (col.field === 'departure' && routeData[rowIndex].arrival) {
+                                            const arrivalTime = parseDateTime(routeData[rowIndex].arrival);
+                                            const departureTime = parseDateTime(dateStr);
+                                            if (arrivalTime !== null && departureTime !== null) {
+                                                // Calculate duration in hours
+                                                const durationMs = departureTime.getTime() - arrivalTime.getTime();
+                                                const durationHours = durationMs / (1000 * 60 * 60);
+                                                // Round to 2 decimal places
+                                                routeData[rowIndex].duration = Math.round(durationHours * 100) / 100;
+                                                
+                                                // Update the duration cell display immediately
+                                                const rowElement = document.querySelector(`[data-row-index="${rowIndex}"]`)?.closest('.custom-row-container');
+                                                if (rowElement) {
+                                                    const durationInput = rowElement.querySelector(`input[data-field="duration"][data-row-index="${rowIndex}"]`);
+                                                    if (durationInput) {
+                                                        durationInput.value = routeData[rowIndex].duration;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Immediately rebuild the cell to add the unselect button
+                                        rebuildDateTimeCell(cell, input, rowIndex, col.field);
+                                        
+                                        handleFieldUpdate(col.field, rowIndex);
                                     }
                                 }
+                            });
+                            
+                            // Create container and add unselect button if manually set
+                            if (isManuallySet) {
+                                const container = document.createElement('div');
+                                container.className = 'datetime-input-container';
+                                
+                                const unselectBtn = document.createElement('button');
+                                unselectBtn.className = 'unselect-btn';
+                                unselectBtn.innerHTML = '✕';
+                                unselectBtn.type = 'button';
+                                unselectBtn.title = 'Clear manual setting';
+                                unselectBtn.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    clearManualDateTime(rowIndex, col.field);
+                                });
+                                
+                                container.appendChild(input);
+                                container.appendChild(unselectBtn);
+                                cell.appendChild(container);
+                            } else {
+                                cell.appendChild(input);
                             }
-                            
-                            dateInput.dataset.field = col.field;
-                            dateInput.dataset.rowIndex = rowIndex;
-                            hourSelect.dataset.field = col.field;
-                            hourSelect.dataset.rowIndex = rowIndex;
-                            minuteSelect.dataset.field = col.field;
-                            minuteSelect.dataset.rowIndex = rowIndex;
-                            
-                            const updateDateTime = function() {
-                                if (dateInput.value && hourSelect.value && minuteSelect.value) {
-                                    // Save state before modification
-                                    saveToHistory();
-                                    
-                                    const newValue = dateInput.value + ' ' + hourSelect.value + ':' + minuteSelect.value;
-                                    routeData[rowIndex][col.field] = newValue;
-                                    handleFieldUpdate(col.field, rowIndex);
-                                }
-                            };
-                            
-                            dateInput.addEventListener('change', updateDateTime);
-                            hourSelect.addEventListener('change', updateDateTime);
-                            minuteSelect.addEventListener('change', updateDateTime);
-                            
-                            dateTimeContainer.appendChild(dateInput);
-                            dateTimeContainer.appendChild(hourSelect);
-                            dateTimeContainer.appendChild(minuteSelect);
-                            cell.appendChild(dateTimeContainer);
                         } else {
                             const input = document.createElement('input');
                             input.type = 'text';
@@ -1306,7 +2373,7 @@
                 rowEl.appendChild(container);
             },
             columns: [
-                { title: "Station", field: "stationId", width: 90, headerSort: false },
+                { title: "Station", field: "stationId", width: 130, headerSort: false },
                 { 
                     title: "Lat<br><span style='font-size: 9px; font-weight: normal; text-transform: none;'>(decimal)</span>", 
                     field: "lat", 
@@ -1331,26 +2398,26 @@
                 { 
                     title: "Spd<br><span style='font-size: 9px; font-weight: normal; text-transform: none;'>(kn)</span>", 
                     field: "speed", 
-                    width: 50, 
+                    width: 40, 
                     headerSort: false,
                     titleFormatter: "html"
                 },
                 { 
                     title: "Arrival", 
                     field: "arrival", 
-                    width: 205,
+                    width: 135,
                     headerSort: false 
                 },
                 { 
                     title: "Departure", 
                     field: "departure", 
-                    width: 205,
+                    width: 135,
                     headerSort: false 
                 },
                 { 
                     title: "On Stn<br><span style='font-size: 9px; font-weight: normal; text-transform: none;'>(hrs)</span>", 
                     field: "duration", 
-                    width: 70, 
+                    width: 45, 
                     headerSort: false,
                     titleFormatter: "html"
                 }
@@ -1366,6 +2433,7 @@
         } else {
             console.log('Loading existing data');
             initializeMap();
+            updateTimeBudget();
         }
         
         // Handle normal ship speed form
@@ -1377,6 +2445,14 @@
                 return;
             }
             
+            // Confirm before applying to all stations
+            if (!confirm(`Apply speed ${normalSpeed} knots to all stations?\n\nThis will overwrite individual station speeds.`)) {
+                return;
+            }
+            
+            // Save state before modification
+            saveToHistory();
+            
             // Update ALL speed cells with the default speed
             routeData.forEach(function(point) {
                 point.speed = normalSpeed;
@@ -1386,8 +2462,7 @@
             calculateTimes();
             table.setData(routeData);
             saveRouteData();
-            
-            alert(`Updated all stations with speed ${normalSpeed} knots.`);
+            updateTimeBudget();
         });
         
         // Handle reset button
@@ -1400,18 +2475,32 @@
             undo();
         });
         
+        // Handle latest end date changes
+        document.getElementById('latest-end-datetime').addEventListener('change', function() {
+            const value = this.value;
+            if (value) {
+                latestEndDate = value.replace(' ', 'T');
+                localStorage.setItem('latestEndDate', latestEndDate);
+                updateTimeBudget();
+            } else {
+                latestEndDate = '';
+                localStorage.setItem('latestEndDate', latestEndDate);
+                updateTimeBudget();
+            }
+        });
+        
         // Handle download CSV
-        document.getElementById('download-csv').addEventListener('click', function() {
+        document.getElementById('download-csv-btn').addEventListener('click', function() {
             downloadCSV();
         });
         
         // Handle download GeoJSON
-        document.getElementById('download-geojson').addEventListener('click', function() {
+        document.getElementById('download-geojson-btn').addEventListener('click', function() {
             downloadGeoJSON();
         });
         
         // Handle upload CSV
-        document.getElementById('upload-csv').addEventListener('click', function() {
+        document.getElementById('upload-csv-btn').addEventListener('click', function() {
             document.getElementById('csv-file-input').click();
         });
         
@@ -1424,15 +2513,88 @@
             e.target.value = '';
         });
         
+        // Handle upload GeoJSON
+        document.getElementById('upload-geojson-btn').addEventListener('click', function() {
+            document.getElementById('geojson-file-input').click();
+        });
+        
+        document.getElementById('geojson-file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const geojson = JSON.parse(event.target.result);
+                        
+                        if (!geojson.features || !Array.isArray(geojson.features)) {
+                            alert('Invalid GeoJSON format. Must contain a features array.');
+                            return;
+                        }
+                        
+                        // Save state before modification
+                        saveToHistory();
+                        
+                        // Extract coordinates from GeoJSON features
+                        const newRouteData = [];
+                        geojson.features.forEach((feature, index) => {
+                            if (feature.geometry && feature.geometry.type === 'Point') {
+                                const coords = feature.geometry.coordinates; // [lng, lat]
+                                const props = feature.properties || {};
+                                
+                                // Use stationCode from file if available, otherwise generate new one
+                                const stationCode = props.stationCode || generateStationCode();
+                                
+                                newRouteData.push({
+                                    id: index + 1,
+                                    stationId: props.stationId || props.name || generateStationName(),
+                                    stationCode: stationCode,
+                                    lat: coords[1], // GeoJSON uses [lng, lat]
+                                    lng: coords[0],
+                                    distance: parseFloat(props.distance) || 0,
+                                    speed: props.speed || '8',
+                                    arrival: props.arrival || props.arrive || '',
+                                    departure: props.departure || '',
+                                    duration: props.duration || '0',
+                                    comments: props.comments || ''
+                                });
+                                
+                                // Track the station code
+                                usedStationCodes.add(stationCode);
+                            }
+                        });
+                        
+                        if (newRouteData.length > 0) {
+                            routeData = newRouteData;
+                            updateDistances();
+                            calculateTimes();
+                            initializeMap();
+                            updateTableData();
+                            saveRouteData();
+                            updateTimeBudget();
+                            alert(`Successfully imported ${newRouteData.length} stations from GeoJSON.`);
+                        } else {
+                            alert('No valid Point features found in GeoJSON file.');
+                        }
+                    } catch (error) {
+                        alert('Error reading GeoJSON file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+            // Reset input so same file can be uploaded again
+            e.target.value = '';
+        });
+        
         // Download route data as CSV
         function downloadCSV() {
-            const headers = ['Station ID', 'Latitude', 'Longitude', 'Distance (nm)', 'Speed (knots)', 'Arrival', 'Departure', 'Duration (hrs)', 'Comments'];
+            const headers = ['Station ID', 'Station Code', 'Latitude', 'Longitude', 'Distance (nm)', 'Speed (knots)', 'Arrival', 'Departure', 'Duration (hrs)', 'Comments'];
             
             let csv = headers.join(',') + '\n';
             
             routeData.forEach(function(point) {
                 const row = [
                     escapeCSV(point.stationId),
+                    escapeCSV(point.stationCode),
                     point.lat,
                     point.lng,
                     point.distance,
@@ -1471,11 +2633,14 @@
                         },
                         "properties": {
                             "name": point.stationId,
+                            "stationCode": point.stationCode,
+                            "distance": point.distance,
+                            "speed": point.speed,
                             "arrive": point.arrival || "",
                             "departure": point.departure || "",
+                            "duration": point.duration || "",
                             "comments": point.comments || "",
-                            "depth": "",
-                            "duration": point.duration || ""
+                            "depth": ""
                         }
                     };
                 })
@@ -1511,19 +2676,28 @@
                     dataLines.forEach(function(line, index) {
                         const values = parseCSVLine(line);
                         
+                        // Support both old format (9 columns) and new format (10 columns with Station Code)
                         if (values.length >= 9) {
+                            const hasStationCode = values.length >= 10;
+                            
                             newRouteData.push({
                                 id: index + 1,
-                                stationId: values[0] || `Station-${index + 1}`,
-                                lat: parseFloat(values[1]) || 0,
-                                lng: parseFloat(values[2]) || 0,
-                                distance: parseFloat(values[3]) || 0,
-                                speed: values[4] || '8',
-                                arrival: values[5] || '',
-                                departure: values[6] || '',
-                                duration: values[7] || '0',
-                                comments: values[8] || ''
+                                stationId: values[0] || generateStationName(),
+                                stationCode: hasStationCode && values[1] ? values[1] : generateStationCode(),
+                                lat: parseFloat(values[hasStationCode ? 2 : 1]) || 0,
+                                lng: parseFloat(values[hasStationCode ? 3 : 2]) || 0,
+                                distance: parseFloat(values[hasStationCode ? 4 : 3]) || 0,
+                                speed: values[hasStationCode ? 5 : 4] || '8',
+                                arrival: values[hasStationCode ? 6 : 5] || '',
+                                departure: values[hasStationCode ? 7 : 6] || '',
+                                duration: values[hasStationCode ? 8 : 7] || '0',
+                                comments: values[hasStationCode ? 9 : 8] || ''
                             });
+                            
+                            // Track the station code if provided
+                            if (hasStationCode && values[1]) {
+                                usedStationCodes.add(values[1]);
+                            }
                         }
                     });
                     
@@ -1535,8 +2709,9 @@
                         updateDistances();
                         calculateTimes();
                         initializeMap();
-                        table.setData(routeData);
+                        updateTableData();
                         saveRouteData();
+                        updateTimeBudget();
                         alert(`Successfully imported ${newRouteData.length} stations from CSV.`);
                     } else {
                         alert('No valid data found in CSV file.');
@@ -1586,6 +2761,41 @@
             
             return values;
         }
+        
+        // Marker display toggle functionality
+        function updateMarkerToggleButtons() {
+            const idBtn = document.getElementById('marker-toggle-id');
+            const numBtn = document.getElementById('marker-toggle-num');
+            
+            if (markerDisplayMode === 'id') {
+                idBtn.style.background = '#1e3a6b';
+                idBtn.style.color = 'white';
+                numBtn.style.background = 'transparent';
+                numBtn.style.color = 'rgba(255,255,255,0.6)';
+            } else {
+                numBtn.style.background = '#1e3a6b';
+                numBtn.style.color = 'white';
+                idBtn.style.background = 'transparent';
+                idBtn.style.color = 'rgba(255,255,255,0.6)';
+            }
+        }
+        
+        document.getElementById('marker-toggle-id').addEventListener('click', function() {
+            markerDisplayMode = 'id';
+            localStorage.setItem('markerDisplayMode', 'id');
+            updateMarkerToggleButtons();
+            initializeMap();
+        });
+        
+        document.getElementById('marker-toggle-num').addEventListener('click', function() {
+            markerDisplayMode = 'number';
+            localStorage.setItem('markerDisplayMode', 'number');
+            updateMarkerToggleButtons();
+            initializeMap();
+        });
+        
+        // Initialize toggle buttons on load
+        updateMarkerToggleButtons();
     </script>
 </body>
 </html>
