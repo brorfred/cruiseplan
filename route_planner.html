@@ -1929,23 +1929,21 @@
                 saveRouteData();
                 updateTimeBudget();
             } else if (field === "speed" || field === "duration") {
-                // When speed or duration changes, we need to recalculate times intelligently:
-                // - Find the last manual time BEFORE or AT this index
-                // - Find the next manual time AFTER this index
-                // - Only recalculate the stations between these two anchors
+                // When speed or duration changes, recalculate times from this point forward
                 
-                let recalcStartIndex = 0;
-                let recalcEndIndex = routeData.length;
-                
-                // Find the last manual time at or before this index
-                for (let i = index; i >= 0; i--) {
-                    if (routeData[i].arrival_manual || routeData[i].departure_manual) {
-                        recalcStartIndex = i + 1; // Start recalculating AFTER this manual time
-                        break;
+                // Special handling for duration changes: update current station's departure first
+                if (field === "duration" && index > 0 && routeData[index].arrival) {
+                    const arrivalDate = parseDateTime(routeData[index].arrival);
+                    if (arrivalDate) {
+                        const duration = parseFloat(routeData[index].duration) || 0;
+                        const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                        routeData[index].departure = formatDateTime(departureDate);
+                        // Keep the manual flag as it was - don't change it
                     }
                 }
                 
                 // Find the next manual time after this index
+                let recalcEndIndex = routeData.length;
                 for (let i = index + 1; i < routeData.length; i++) {
                     if (routeData[i].arrival_manual || routeData[i].departure_manual) {
                         recalcEndIndex = i; // Stop recalculating BEFORE this manual time
@@ -1953,44 +1951,34 @@
                     }
                 }
                 
-                // Recalculate only the affected range
-                if (recalcStartIndex < recalcEndIndex) {
-                    // Use a modified version that only recalculates up to recalcEndIndex
-                    for (let i = recalcStartIndex; i < recalcEndIndex; i++) {
-                        const point = routeData[i];
-                        
-                        if (i === 0) {
-                            point.arrival = "";
-                        } else {
-                            const prev = routeData[i - 1];
-                            const segmentDistance = point.distance - prev.distance;
-                            let speed = parseFloat(point.speed);
-                            if (!speed || speed <= 0) {
-                                speed = parseFloat(prev.speed);
-                            }
+                // Recalculate all stations from the next one up to the next manual time
+                for (let i = index + 1; i < recalcEndIndex; i++) {
+                    const point = routeData[i];
+                    const prev = routeData[i - 1];
+                    const segmentDistance = point.distance - prev.distance;
+                    let speed = parseFloat(point.speed);
+                    if (!speed || speed <= 0) {
+                        speed = parseFloat(prev.speed);
+                    }
+                    
+                    if (speed && speed > 0 && prev.departure) {
+                        const travelTimeHours = segmentDistance / speed;
+                        const prevDeparture = parseDateTime(prev.departure);
+                        if (prevDeparture !== null) {
+                            const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
+                            point.arrival = formatDateTime(arrivalDate);
+                            point.arrival_manual = false;
                             
-                            if (speed && speed > 0 && prev.departure) {
-                                const travelTimeHours = segmentDistance / speed;
-                                const prevDeparture = parseDateTime(prev.departure);
-                                if (prevDeparture !== null) {
-                                    const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
-                                    point.arrival = formatDateTime(arrivalDate);
-                                    point.arrival_manual = false;
-                                    
-                                    const duration = parseFloat(point.duration) || 0;
-                                    const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
-                                    point.departure = formatDateTime(departureDate);
-                                    point.departure_manual = false;
-                                }
-                            }
+                            const duration = parseFloat(point.duration) || 0;
+                            const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                            point.departure = formatDateTime(departureDate);
+                            point.departure_manual = false;
                         }
                     }
-                    updateCellValues(recalcStartIndex);
-                } else {
-                    // No recalculation needed or entire route
-                    calculateTimes();
-                    updateTableData();
                 }
+                
+                // Update the display for the current station and all affected stations
+                updateCellValues(index);
                 
                 saveRouteData();
                 updateTimeBudget();
