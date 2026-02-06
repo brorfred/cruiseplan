@@ -1942,17 +1942,9 @@
                     }
                 }
                 
-                // Find the next manual time after this index
-                let recalcEndIndex = routeData.length;
+                // Recalculate all stations from the next one forward
+                // Handle manual times intelligently: update what we can, preserve manual settings
                 for (let i = index + 1; i < routeData.length; i++) {
-                    if (routeData[i].arrival_manual || routeData[i].departure_manual) {
-                        recalcEndIndex = i; // Stop recalculating BEFORE this manual time
-                        break;
-                    }
-                }
-                
-                // Recalculate all stations from the next one up to the next manual time
-                for (let i = index + 1; i < recalcEndIndex; i++) {
                     const point = routeData[i];
                     const prev = routeData[i - 1];
                     const segmentDistance = point.distance - prev.distance;
@@ -1966,13 +1958,44 @@
                         const prevDeparture = parseDateTime(prev.departure);
                         if (prevDeparture !== null) {
                             const arrivalDate = new Date(prevDeparture.getTime() + travelTimeHours * 3600000);
-                            point.arrival = formatDateTime(arrivalDate);
-                            point.arrival_manual = false;
                             
-                            const duration = parseFloat(point.duration) || 0;
-                            const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
-                            point.departure = formatDateTime(departureDate);
-                            point.departure_manual = false;
+                            // Handle different manual time scenarios
+                            if (point.arrival_manual && point.departure_manual) {
+                                // Both times are manual - can't recalculate anything, stop here
+                                break;
+                            } else if (point.departure_manual && !point.arrival_manual) {
+                                // Departure is manual, update arrival and duration
+                                point.arrival = formatDateTime(arrivalDate);
+                                point.arrival_manual = false;
+                                
+                                // Recalculate duration based on new arrival and manual departure
+                                const departureDate = parseDateTime(point.departure);
+                                if (departureDate !== null) {
+                                    const durationMs = departureDate.getTime() - arrivalDate.getTime();
+                                    const durationHours = durationMs / (1000 * 60 * 60);
+                                    point.duration = Math.round(durationHours * 100) / 100;
+                                }
+                                // Continue forward from this manual departure
+                            } else if (point.arrival_manual && !point.departure_manual) {
+                                // Arrival is manual - recalculate departure from manual arrival + duration
+                                const manualArrival = parseDateTime(point.arrival);
+                                if (manualArrival !== null) {
+                                    const duration = parseFloat(point.duration) || 0;
+                                    const departureDate = new Date(manualArrival.getTime() + duration * 3600000);
+                                    point.departure = formatDateTime(departureDate);
+                                    point.departure_manual = false;
+                                }
+                                // Continue forward from this calculated departure
+                            } else {
+                                // Neither is manual - calculate both normally
+                                point.arrival = formatDateTime(arrivalDate);
+                                point.arrival_manual = false;
+                                
+                                const duration = parseFloat(point.duration) || 0;
+                                const departureDate = new Date(arrivalDate.getTime() + duration * 3600000);
+                                point.departure = formatDateTime(departureDate);
+                                point.departure_manual = false;
+                            }
                         }
                     }
                 }
