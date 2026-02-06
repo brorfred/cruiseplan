@@ -1809,6 +1809,12 @@
                             departureInput.value = rowData.departure || '';
                         }
                     }
+                    
+                    // Update duration input
+                    const durationInput = rowElement.querySelector(`input[data-field="duration"][data-row-index="${i}"]`);
+                    if (durationInput) {
+                        durationInput.value = rowData.duration || '';
+                    }
                 }
             }
         }
@@ -2260,6 +2266,15 @@
                                                 const durationHours = durationMs / (1000 * 60 * 60);
                                                 // Round to 2 decimal places
                                                 routeData[rowIndex].duration = Math.round(durationHours * 100) / 100;
+                                                
+                                                // Update the duration cell display immediately
+                                                const rowElement = document.querySelector(`[data-row-index="${rowIndex}"]`)?.closest('.custom-row-container');
+                                                if (rowElement) {
+                                                    const durationInput = rowElement.querySelector(`input[data-field="duration"][data-row-index="${rowIndex}"]`);
+                                                    if (durationInput) {
+                                                        durationInput.value = routeData[rowIndex].duration;
+                                                    }
+                                                }
                                             }
                                         }
                                         
